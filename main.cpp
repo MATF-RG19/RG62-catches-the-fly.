@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 // 	glutReshapeFunc(on_reshape);
 	glutKeyboardFunc(on_keyboard);
 	
-	glClearColor(0.75, 0.75, 0.75, 0);
+	glClearColor(0.75, 0.75, 0.70, 0);
 	
 	glClearColor(0, 0, 0, 0);
 
@@ -87,7 +87,6 @@ static void on_keyboard(unsigned char key, int x, int y)
         break;
 	case 'w':
 	case 'W':
-		printf("A");
 		break;
 	}
 }
