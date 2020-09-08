@@ -1,3 +1,7 @@
+#ifndef SPIDER_HPP
+
+#define SPIDER_HPP
+
 #include "platform.hpp"
 #include <stdlib.h>
 #include <GL/glut.h>
@@ -8,13 +12,14 @@
 #define RIGHT 8
 #define OVERFLOW 16
 #define UNDERFLOW 0
+#define T_VALUE 4
 
 class spider
 {
 public:
     
 	//konstruktor
-	spider(platform& p);
+	spider(platform * p);
 
 	//metode
 	void draw_spider();
@@ -26,7 +31,7 @@ public:
     void move_backward();
     
     void calculate_the_direction_vector();
-    
+
     //polja
     double x_pos;
     double y_pos;
@@ -39,8 +44,9 @@ public:
     
     unsigned int looking_at;
     
-    platform current_platform;
+    platform* current_platform;
     
 	//destruktor
 	~spider();
 };
+#endif
