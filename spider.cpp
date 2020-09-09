@@ -16,6 +16,19 @@ spider::spider(platform * p) {
     looking_at = 1;
     
     current_platform = p;
+
+    key = false;
+}
+
+platform* spider::get_platform() {
+    return current_platform;
+}
+
+bool spider::get_key() {
+    return key;
+}
+void spider::set_key(bool k) {
+    this->key = k;
 }
 
 //metod koji na osnovu informacije u kom smeru igrac gleda odredjuje vektor pravca
@@ -48,7 +61,7 @@ void spider::draw_spider() {
         glColor3f(1, 1, 1);
         glTranslatef(this->x_pos, this->y_pos, this->z_pos);
         glRotatef(this->angle, 0, 0, 1);
-        //glScalef(1.2, 0.8, 0.2);
+        glScalef(1.4, 1, 1);
         glutSolidSphere(1, 20, 20);
     glPopMatrix();
 

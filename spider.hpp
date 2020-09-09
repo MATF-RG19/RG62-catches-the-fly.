@@ -32,6 +32,11 @@ public:
     
     void calculate_the_direction_vector();
 
+    platform* get_platform();
+
+    bool get_key();
+    void set_key(bool k);
+
     //polja
     double x_pos;
     double y_pos;
@@ -43,6 +48,7 @@ public:
     double angle;
     
     unsigned int looking_at;
+    bool key;
     
     platform* current_platform;
     

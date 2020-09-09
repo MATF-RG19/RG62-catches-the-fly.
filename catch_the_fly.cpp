@@ -1,9 +1,12 @@
 #include <iostream>
 #include <GL/glut.h>
+#include <stdlib.h>
 #include <cmath>
 #include <string>
 #include <time.h>
 #include <vector>
+#include <unistd.h>
+
 
 #include "spider.hpp"
 #include "platform.hpp"
@@ -28,7 +31,7 @@ platform p14(-12, -8, 0, BOTTOM | RIGHT);
 platform p13(-12, 4, 0, LEFT | RIGHT);
 platform p12(-8, 8, 0, TOP | BOTTOM);
 platform p11(-12, -4, 0, LEFT | RIGHT);
-platform p10(-8, -8, 0, TOP | BOTTOM | LEFT);
+platform p10(-8, -8, 0, TOP | BOTTOM | RIGHT);
 platform p9(-12, 0, 0, TOP | BOTTOM | LEFT | RIGHT);
 platform p8(-8, 4, 0, LEFT);
 platform p7(-4, 8, 0, TOP | LEFT);
@@ -45,9 +48,12 @@ platform start(0, 0, 0, TOP);
 
 spider s(&start);
 
-enemy e1(-4, -8, 0);
-enemy e2(-8, 4, 0);
-enemy e3(-12, -4, 0);
+vector<platform*> v1 = {&p5, &p2, &p1, &p3, &p7};
+vector<platform*> v2 = {&p10, &p6, &p4, &p8};
+vector<platform*> v3 = {&p14, &p11, &p9, &p13, &p15};
+enemy e1(-4, -4, 0, 1, v1, -1);
+enemy e2(-8, -4, 0, 1, v2, -1);
+enemy e3(-12, 4, 0, 3, v3, 1);
 
 int main(int argc, char **argv)
 {
@@ -102,11 +108,6 @@ int main(int argc, char **argv)
     p13.set_neighbours(&p9, &p15, nullptr, &p8);
     p14.set_neighbours(nullptr, &p11, nullptr, &p10);
     p15.set_neighbours(&p13, nullptr, nullptr, &p12);
-
-
-    /*p2.set_neighbours(&p5, &p1, &p5, nullptr);
-    p3.set_neighbours(&p1, &p7, &p8, nullptr);
-    p4.set_neighbours(&p6, &p8, &p9, &p1);*/
 
     glutMainLoop();
 
@@ -179,6 +180,7 @@ static void on_display(void)
 static void on_keyboard(unsigned char key, int x, int y)
 {
 
+    platform* last = nullptr;
     switch (key)
     {
 
@@ -187,11 +189,56 @@ static void on_keyboard(unsigned char key, int x, int y)
         break;
 
     case 'w':
+        last = s.get_platform();
         s.move_forward();
+
+        if (last != s.get_platform()) {
+
+            if (s.get_platform() == &special) {
+                s.set_key(true);
+                cout << "Key" << endl;
+            }
+
+            if (s.get_platform() == &end_game && s.get_key()) {
+                cout << "End" << endl;
+            }
+            
+            if (s.get_platform() == e1.get_platform()) {
+                e1.set_show(false);
+            }
+            if (s.get_platform() == e2.get_platform()) {
+                e2.set_show(false);
+            }
+            if (s.get_platform() == e3.get_platform()) {
+                e3.set_show(false);
+            }
+
+            if (e1.get_show()) {
+                e1.next_position();
+                if (e1.get_platform() == s.get_platform()) {
+                    cout << "Mrtav" << endl;
+                }
+            }
+            if (e2.get_show()) {
+                e2.next_position();
+                if (e2.get_platform() == s.get_platform()) {
+                    cout << "Mrtav" << endl;
+                }
+            }
+            if (e3.get_show()) {
+                e3.next_position();
+                if (e3.get_platform() == s.get_platform()) {
+                    cout << "Mrtav" << endl;
+                }
+            }
+        }
         break;
 
     case 's':
         s.move_backward();
+        e1.next_position();
+        e2.next_position();
+        e3.next_position();
         break;
 
     case 'a':
@@ -209,6 +256,4 @@ static void on_keyboard(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
-static void draw_level()
-{
-}
+static void draw_level() {}
