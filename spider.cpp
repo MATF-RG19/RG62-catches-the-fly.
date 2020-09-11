@@ -18,6 +18,10 @@ spider::spider(platform * p) {
     current_platform = p;
 
     key = false;
+
+    dead = false;
+
+    show = true;
 }
 
 platform* spider::get_platform() {
@@ -57,14 +61,15 @@ void spider::calculate_the_direction_vector() {
 //metod koji iscrtava pauka
 void spider::draw_spider() {
     
-    glPushMatrix();
-        glColor3f(1, 1, 1);
-        glTranslatef(this->x_pos, this->y_pos, this->z_pos);
-        glRotatef(this->angle, 0, 0, 1);
-        glScalef(1.4, 1, 1);
-        glutSolidSphere(1, 20, 20);
-    glPopMatrix();
-
+    if (show) {
+        glPushMatrix();
+            glColor3f(1, 1, 1);
+            glTranslatef(this->x_pos, this->y_pos, this->z_pos);
+            glRotatef(this->angle, 0, 0, 1);
+            glScalef(1.4, 1, 1);
+            glutSolidSphere(1, 20, 20);
+        glPopMatrix();
+        }
 }
 
 void spider::rotate_left() {
@@ -95,14 +100,17 @@ void spider::rotate_right() {
 }
 
 void spider::move_forward() {
-    
+
+        x_pos += direction_coordinate_x * 0.4;
+        y_pos += direction_coordinate_y * 0.4;
+}
+
+platform* spider::next_platform() {
+
     if (this->looking_at & this->current_platform->neighbours) {
-
-        this->x_pos += this->direction_coordinate_x;
-        this->y_pos += this->direction_coordinate_y;
-
         current_platform = current_platform->get_neighbour(this->looking_at);
     }
+    return current_platform;
 }
 
 void spider::move_backward() {

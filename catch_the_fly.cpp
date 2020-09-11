@@ -12,6 +12,10 @@
 #include "platform.hpp"
 #include "enemy.hpp"
 
+#define TIMER_ID 0
+#define TIMER_ID1 1
+#define TIMER_ID2 2
+#define TIMER_ID3 3
 using namespace std;
 
 static int window_width = 1000;
@@ -21,10 +25,16 @@ static void on_display(void);
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 static void draw_level();
+static void on_timer_move_enemy(int value);
+static void on_timer(int value);
 
 int angle = 0;
 float xPos = 0;
 float yPos = 0;
+bool player_animation = false;
+bool enemy_animation = false;
+int translation_value = 10;
+bool tmp = true;
 
 platform p15(-12, 8, 0, BOTTOM | LEFT);
 platform p14(-12, -8, 0, BOTTOM | RIGHT);
@@ -64,7 +74,6 @@ int main(int argc, char **argv)
     glutInitWindowSize(window_width, window_height);
     glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH) - window_width) / 2, (glutGet(GLUT_SCREEN_HEIGHT) - window_height) / 2);
     glutCreateWindow("Catch the fly");
-
     glutDisplayFunc(on_display);
     glutKeyboardFunc(on_keyboard);
     glutReshapeFunc(on_reshape);
@@ -177,10 +186,127 @@ static void on_display(void)
     glutSwapBuffers();
 }
 
+void activate_enemies() {
+
+    if (!e1.get_dead()) {
+        e1.next_position();
+        if (e1.get_platform() == s.get_platform()) {
+            s.dead = true;
+            glutTimerFunc(15, on_timer, TIMER_ID1);
+            return;
+        }
+    }
+    if (!e2.get_dead()) {
+        e2.next_position();
+        if (e2.get_platform() == s.get_platform()) {
+            s.dead = true;
+            glutTimerFunc(15, on_timer, TIMER_ID2);
+            return;
+        }
+    }
+    if (!e3.get_dead()) {
+        e3.next_position();
+        if (e3.get_platform() == s.get_platform()) {
+            s.dead = true;
+            glutTimerFunc(15, on_timer, TIMER_ID3);
+            return;
+        }
+    }
+
+    glutTimerFunc(15, on_timer_move_enemy, TIMER_ID);
+}
+
+static void on_timer(int value) {
+
+    if (value == TIMER_ID1) {
+        e1.tanslate();
+    }
+    if (value == TIMER_ID2) {
+        e2.tanslate();
+    }
+    if (value == TIMER_ID3) {
+        e3.tanslate();
+    }
+
+    glutPostRedisplay();
+
+    translation_value--;
+
+    if (translation_value == 0) {
+        translation_value = 10;
+        player_animation = false;
+        enemy_animation = false;
+        tmp = true;
+        s.show = false;
+    }
+
+    if (enemy_animation) 
+        glutTimerFunc(15, on_timer, value);
+}
+
+static void on_timer_move_player(int value) {
+
+    if (value != TIMER_ID) {
+        return;
+    }
+
+    s.move_forward();
+
+    if (e1.get_kill()) {
+        e1.set_show(false);
+    }
+    if (e2.get_kill()) {
+        e2.set_show(false);
+    }
+    if (e3.get_kill()) {
+        e3.set_show(false);
+    }
+
+    glutPostRedisplay();
+
+    translation_value--;
+
+    if (translation_value == 0) {
+        player_animation = false;
+        translation_value = 10;
+        activate_enemies();
+    }
+
+    if (player_animation) 
+        glutTimerFunc(15, on_timer_move_player, TIMER_ID);
+}
+
+static void on_timer_move_enemy(int value) {
+
+    if (value != TIMER_ID) {
+        return;
+    }
+
+    e1.tanslate();
+    e2.tanslate();
+    e3.tanslate();
+
+    glutPostRedisplay();
+
+    translation_value--;
+
+    if (translation_value == 0) {
+        translation_value = 10;
+        player_animation = false;
+        enemy_animation = false;
+        tmp = true;
+    }
+
+    if (enemy_animation) 
+        glutTimerFunc(15, on_timer_move_enemy, TIMER_ID);
+}
+
 static void on_keyboard(unsigned char key, int x, int y)
 {
 
     platform* last = nullptr;
+    platform* next = nullptr;
+    
     switch (key)
     {
 
@@ -189,10 +315,22 @@ static void on_keyboard(unsigned char key, int x, int y)
         break;
 
     case 'w':
-        last = s.get_platform();
-        s.move_forward();
 
-        if (last != s.get_platform()) {
+        if (!player_animation && tmp) {
+            
+            player_animation = true;
+            enemy_animation = true;
+            tmp = false;
+
+            last = s.get_platform();
+            next = s.next_platform();
+
+            if (last == next) {
+                player_animation = false;
+                enemy_animation = false;
+                tmp = true;
+                break;
+            }
 
             if (s.get_platform() == &special) {
                 s.set_key(true);
@@ -203,34 +341,20 @@ static void on_keyboard(unsigned char key, int x, int y)
                 cout << "End" << endl;
             }
             
-            if (s.get_platform() == e1.get_platform()) {
-                e1.set_show(false);
+            if (s.get_platform() == e1.get_platform() && !e1.get_dead()) {
+                e1.set_dead(true);
+                e1.set_kill(true);
             }
-            if (s.get_platform() == e2.get_platform()) {
-                e2.set_show(false);
+            if (s.get_platform() == e2.get_platform() && !e2.get_dead()) {
+                e2.set_dead(true);
+                e2.set_kill(true);
             }
-            if (s.get_platform() == e3.get_platform()) {
-                e3.set_show(false);
+            if (s.get_platform() == e3.get_platform() && !e3.get_dead()) {
+                e3.set_dead(true);
+                e3.set_kill(true);
             }
-
-            if (e1.get_show()) {
-                e1.next_position();
-                if (e1.get_platform() == s.get_platform()) {
-                    cout << "Mrtav" << endl;
-                }
-            }
-            if (e2.get_show()) {
-                e2.next_position();
-                if (e2.get_platform() == s.get_platform()) {
-                    cout << "Mrtav" << endl;
-                }
-            }
-            if (e3.get_show()) {
-                e3.next_position();
-                if (e3.get_platform() == s.get_platform()) {
-                    cout << "Mrtav" << endl;
-                }
-            }
+            
+            glutTimerFunc(15, on_timer_move_player, TIMER_ID);
         }
         break;
 

@@ -12,7 +12,7 @@
 #define RIGHT 8
 #define OVERFLOW 16
 #define UNDERFLOW 0
-#define T_VALUE 4
+#define T_VALUE 1
 
 class spider
 {
@@ -33,6 +33,7 @@ public:
     void calculate_the_direction_vector();
 
     platform* get_platform();
+    platform* next_platform();
 
     bool get_key();
     void set_key(bool k);
@@ -49,6 +50,10 @@ public:
     
     unsigned int looking_at;
     bool key;
+
+    bool dead;
+
+    bool show;
     
     platform* current_platform;
     

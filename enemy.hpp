@@ -23,7 +23,14 @@ public:
     bool get_show();  
     void set_show(bool s);
 
+    bool get_dead();
+    void set_dead(bool d);
+    bool get_kill();
+    void set_kill(bool k);
+
     platform* get_platform();
+
+    void tanslate();
 
     //polja
     double x_pos;
@@ -33,6 +40,9 @@ public:
     int position;
     int direction;
     bool show;
+
+    bool is_dead;
+    bool kill;
 
     std::vector<platform*> platforms;
 
