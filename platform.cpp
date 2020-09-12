@@ -40,10 +40,10 @@ platform* platform::get_neighbour(unsigned int side) {
     }
 }
 
-void platform::draw_platform() {
+void platform::draw_platform(int p) {
     
     glPushMatrix();
-        glColor3f(0.5, 0.5, 0.5);
+        glColor3f(p, 0.5, 0.5);
         glTranslatef(this->x_pos, this->y_pos, this->z_pos);
         glScalef(3.8, 3.8, 0.5);
         glutSolidCube(1);

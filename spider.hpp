@@ -24,11 +24,10 @@ public:
 	//metode
 	void draw_spider();
 
-    void rotate_left();
-	void rotate_right();
+    void rotate_left(bool r);
+	void rotate_right(bool r);
 
 	void move_forward();
-    void move_backward();
     
     void calculate_the_direction_vector();
 
@@ -37,11 +36,14 @@ public:
 
     bool get_key();
     void set_key(bool k);
+    bool get_dead();
+    void set_dead(bool d);
 
     //polja
     double x_pos;
     double y_pos;
     double z_pos;
+    platform* current_platform;
     
     double direction_coordinate_x;
     double direction_coordinate_y;
@@ -49,14 +51,10 @@ public:
     double angle;
     
     unsigned int looking_at;
+    bool dead;
     bool key;
 
-    bool dead;
-
-    bool show;
-    
-    platform* current_platform;
-    
+    bool rot;
 	//destruktor
 	~spider();
 };

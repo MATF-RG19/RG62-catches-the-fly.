@@ -21,7 +21,7 @@ spider::spider(platform * p) {
 
     dead = false;
 
-    show = true;
+    bool rot = true;
 }
 
 platform* spider::get_platform() {
@@ -33,6 +33,14 @@ bool spider::get_key() {
 }
 void spider::set_key(bool k) {
     this->key = k;
+}
+
+bool spider::get_dead() {
+    return this->dead;
+}
+
+void spider::set_dead(bool d) {
+    this->dead = d;
 }
 
 //metod koji na osnovu informacije u kom smeru igrac gleda odredjuje vektor pravca
@@ -61,7 +69,7 @@ void spider::calculate_the_direction_vector() {
 //metod koji iscrtava pauka
 void spider::draw_spider() {
     
-    if (show) {
+    if (!dead) {
         glPushMatrix();
             glColor3f(1, 1, 1);
             glTranslatef(this->x_pos, this->y_pos, this->z_pos);
@@ -72,31 +80,38 @@ void spider::draw_spider() {
         }
 }
 
-void spider::rotate_left() {
+void spider::rotate_left(bool r) {
     
-    this->angle -= 90.0;
-    
-    this->looking_at <<= 1;
-    
-    
-    if (this->looking_at == OVERFLOW) {
-        this->looking_at = 1;
+    if (r) {
+
+        this->looking_at <<= 1;
+        
+        if (this->looking_at == OVERFLOW) {
+            this->looking_at = 1;
+        }
+        
+        calculate_the_direction_vector();
     }
-    
-    calculate_the_direction_vector();
+    else {
+        this->angle += 9.0;
+    }
 }
 
-void spider::rotate_right() {
+void spider::rotate_right(bool r) {
     
-    this->angle += 90.0;
+    if (r) {
     
-    this->looking_at >>= 1;
-    
-    if (this->looking_at == UNDERFLOW) {
-        this->looking_at = RIGHT;
+        this->looking_at >>= 1;
+        
+        if (this->looking_at == UNDERFLOW) {
+            this->looking_at = RIGHT;
+        }
+        
+        calculate_the_direction_vector();
     }
-    
-    calculate_the_direction_vector();
+    else {
+        this->angle -= 9.0;
+    }
 }
 
 void spider::move_forward() {
@@ -111,25 +126,6 @@ platform* spider::next_platform() {
         current_platform = current_platform->get_neighbour(this->looking_at);
     }
     return current_platform;
-}
-
-void spider::move_backward() {
-    
-    unsigned look_behind = this->looking_at;
-
-    if (this->looking_at == TOP || this->looking_at == LEFT) {
-        look_behind <<= 2;
-    }
-    else {
-        look_behind >>= 2;
-    }
-
-    if (look_behind & current_platform->neighbours) {
-        this->x_pos -= this->direction_coordinate_x;
-        this->y_pos -= this->direction_coordinate_y;
-
-        current_platform = current_platform->get_neighbour(look_behind);
-    }
 }
 
 spider::~spider() {};

@@ -7,7 +7,6 @@
 #include <vector>
 #include <unistd.h>
 
-
 #include "spider.hpp"
 #include "platform.hpp"
 #include "enemy.hpp"
@@ -24,17 +23,33 @@ static int window_height = 600;
 static void on_display(void);
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
+
 static void draw_level();
+static void on_timer_move_player(int value);
+static void on_timer_move_enemyes(int value);
 static void on_timer_move_enemy(int value);
-static void on_timer(int value);
+static void on_timer_rotate_player(int value);
 
 int angle = 0;
 float xPos = 0;
 float yPos = 0;
+
 bool player_animation = false;
+bool rotate_animation = false;
 bool enemy_animation = false;
+
 int translation_value = 10;
-bool tmp = true;
+bool block_keyboard = false;
+
+bool show_fly = true;
+
+platform ordinary_platform1(-16,-8, 0, 0);
+platform ordinary_platform2(-16, -4, 0, 0);
+platform ordinary_platform3(-16, 4, 0, 0);
+platform ordinary_platform4(-16, 8, 0, 0);
+platform ordinary_platform5(0, -4, 0, 0);
+platform ordinary_platform6(0, 4, 0, 0);
+platform ordinary_platform7(0, 8, 0, 0);
 
 platform p15(-12, 8, 0, BOTTOM | LEFT);
 platform p14(-12, -8, 0, BOTTOM | RIGHT);
@@ -42,7 +57,7 @@ platform p13(-12, 4, 0, LEFT | RIGHT);
 platform p12(-8, 8, 0, TOP | BOTTOM);
 platform p11(-12, -4, 0, LEFT | RIGHT);
 platform p10(-8, -8, 0, TOP | BOTTOM | RIGHT);
-platform p9(-12, 0, 0, TOP | BOTTOM | LEFT | RIGHT);
+platform p9(-12, 0, 0, BOTTOM | LEFT | RIGHT);
 platform p8(-8, 4, 0, LEFT);
 platform p7(-4, 8, 0, TOP | LEFT);
 platform p6(-8, -4, 0, BOTTOM | LEFT | RIGHT);
@@ -118,6 +133,10 @@ int main(int argc, char **argv)
     p14.set_neighbours(nullptr, &p11, nullptr, &p10);
     p15.set_neighbours(&p13, nullptr, nullptr, &p12);
 
+
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glutMainLoop();
 
     return 0;
@@ -147,39 +166,103 @@ static void on_display(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(15, 15, 15, -8, 0, 0, 0, 0, 1);
+    //gluLookAt(s.x_pos + 15, s.y_pos + 15, 15, s.x_pos, s.y_pos, 0, 0, 0, 1);
+
+    if (!s.get_key()) {
+        glPushMatrix();
+            glColor3f(1, 1, 0);
+            glTranslatef(0, -8, 2);
+            glutSolidCube(1);
+        glPopMatrix();
+    }
+    else {
+        glPushMatrix();
+            end_game.draw_platform(0);
+        glPopMatrix();
+    }
+
+    if (show_fly) {
+        glPushMatrix();
+            glTranslatef(-16, 0, 2);
+            glColor3f(1, 0, 0);
+            glutSolidCube(1);
+        glPopMatrix();
+    }
 
     glPushMatrix();
-
         e1.draw_enemy();
         e2.draw_enemy();
         e3.draw_enemy();
         
-        p15.draw_platform();
-        p14.draw_platform();
-        p13.draw_platform();
-        p12.draw_platform();
-        p11.draw_platform();
-        p10.draw_platform();
-        p9.draw_platform();
-        p8.draw_platform();
-        p7.draw_platform();
-        p6.draw_platform();
-        p5.draw_platform();
-        p4.draw_platform();
-        p3.draw_platform();
-        p2.draw_platform();
-        p1.draw_platform();
+        ordinary_platform1.draw_platform(1);
+        ordinary_platform2.draw_platform(1);
+        ordinary_platform3.draw_platform(1);
+        ordinary_platform4.draw_platform(1);
+        ordinary_platform5.draw_platform(1);
+        ordinary_platform6.draw_platform(1);
+        ordinary_platform7.draw_platform(1);
 
-        special.draw_platform();
-        end_game.draw_platform();
-        start.draw_platform();
+        p15.draw_platform(0);
+        p14.draw_platform(0);
+        p13.draw_platform(0);
+        p12.draw_platform(0);
+        p11.draw_platform(0);
+        p10.draw_platform(0);
+        p9.draw_platform(0);
+        p8.draw_platform(0);
+        p7.draw_platform(0);
+        p6.draw_platform(0);
+        p5.draw_platform(0);
+        p4.draw_platform(0);
+        p3.draw_platform(0);
+        p2.draw_platform(0);
+        p1.draw_platform(0);
+
+        special.draw_platform(0);
+        start.draw_platform(0);
+
     glPopMatrix();
 
     glPushMatrix();
         s.draw_spider();
     glPopMatrix();
 
+
     glPushMatrix();
+        glColor3f(0, 1, 1);
+        glTranslatef(0, -3.5, 1);
+        glutSolidCone(1, 2, 20, 20);
+    glPopMatrix();
+
+    glPushMatrix();
+        glColor3f(0, 1, 0);
+        glTranslatef(0, 6, 1);
+        glScalef(2, 6, 2);
+        glutSolidCube(1);
+        draw_level();
+    glPopMatrix();
+
+    glPushMatrix();
+        glColor3f(0, 1, 0);
+        glTranslatef(-16, 6, 1);
+        glScalef(2, 6, 2);
+        glutSolidCube(1);
+        draw_level();
+    glPopMatrix();
+
+    glPushMatrix();
+        glColor3f(0, 1, 0);
+        glTranslatef(-16, -6, 1);
+        glScalef(2, 6, 2);
+        glutSolidCube(1);
+        draw_level();
+    glPopMatrix();
+
+    glPushMatrix();
+        glColor3f(0.2, 0.2, 0.2);
+        glTranslatef(-8, 0, -1.5);
+        glScalef(1, 1, 0.1);
+        glutSolidCube(21);
         draw_level();
     glPopMatrix();
 
@@ -191,57 +274,29 @@ void activate_enemies() {
     if (!e1.get_dead()) {
         e1.next_position();
         if (e1.get_platform() == s.get_platform()) {
-            s.dead = true;
-            glutTimerFunc(15, on_timer, TIMER_ID1);
+            s.set_dead(true);
+            glutTimerFunc(15, on_timer_move_enemy, TIMER_ID1);
             return;
         }
     }
     if (!e2.get_dead()) {
         e2.next_position();
         if (e2.get_platform() == s.get_platform()) {
-            s.dead = true;
-            glutTimerFunc(15, on_timer, TIMER_ID2);
+            s.set_dead(true);
+            glutTimerFunc(15, on_timer_move_enemy, TIMER_ID2);
             return;
         }
     }
     if (!e3.get_dead()) {
         e3.next_position();
         if (e3.get_platform() == s.get_platform()) {
-            s.dead = true;
-            glutTimerFunc(15, on_timer, TIMER_ID3);
+            s.set_dead(true);
+            glutTimerFunc(15, on_timer_move_enemy, TIMER_ID3);
             return;
         }
     }
 
-    glutTimerFunc(15, on_timer_move_enemy, TIMER_ID);
-}
-
-static void on_timer(int value) {
-
-    if (value == TIMER_ID1) {
-        e1.tanslate();
-    }
-    if (value == TIMER_ID2) {
-        e2.tanslate();
-    }
-    if (value == TIMER_ID3) {
-        e3.tanslate();
-    }
-
-    glutPostRedisplay();
-
-    translation_value--;
-
-    if (translation_value == 0) {
-        translation_value = 10;
-        player_animation = false;
-        enemy_animation = false;
-        tmp = true;
-        s.show = false;
-    }
-
-    if (enemy_animation) 
-        glutTimerFunc(15, on_timer, value);
+    glutTimerFunc(15, on_timer_move_enemyes, TIMER_ID);
 }
 
 static void on_timer_move_player(int value) {
@@ -276,7 +331,7 @@ static void on_timer_move_player(int value) {
         glutTimerFunc(15, on_timer_move_player, TIMER_ID);
 }
 
-static void on_timer_move_enemy(int value) {
+static void on_timer_move_enemyes(int value) {
 
     if (value != TIMER_ID) {
         return;
@@ -294,11 +349,72 @@ static void on_timer_move_enemy(int value) {
         translation_value = 10;
         player_animation = false;
         enemy_animation = false;
-        tmp = true;
+        block_keyboard = false;
+
+        if (s.get_platform() == &end_game && s.get_key()) {
+            block_keyboard = true;
+            show_fly = false;
+            cout << "End" << endl;
+        }
     }
 
     if (enemy_animation) 
-        glutTimerFunc(15, on_timer_move_enemy, TIMER_ID);
+        glutTimerFunc(15, on_timer_move_enemyes, TIMER_ID);
+}
+
+static void on_timer_move_enemy(int value) {
+
+    if (value == TIMER_ID1) {
+        e1.tanslate();
+    }
+    if (value == TIMER_ID2) {
+        e2.tanslate();
+    }
+    if (value == TIMER_ID3) {
+        e3.tanslate();
+    }
+
+    glutPostRedisplay();
+
+    translation_value--;
+
+    if (translation_value == 0) {
+        translation_value = 10;
+        player_animation = false;
+        enemy_animation = false;
+        block_keyboard = true;
+        s.set_dead(true);
+    }
+
+    if (enemy_animation) 
+        glutTimerFunc(15, on_timer_move_enemy, value);
+}
+
+static void on_timer_rotate_player(int value) {
+
+    /*if (value != TIMER_ID1 && value != TIMER_ID2) {
+        return;
+    }*/
+
+    if (value == TIMER_ID1) {
+        s.rotate_left(false);
+    }
+    else {
+        s.rotate_right(false);
+    }
+
+    glutPostRedisplay();
+
+    translation_value--;
+
+    if (translation_value == 0) {
+        translation_value = 10;
+        rotate_animation = false;
+        block_keyboard = false;
+    }
+
+    if (rotate_animation) 
+        glutTimerFunc(15, on_timer_rotate_player, value);
 }
 
 static void on_keyboard(unsigned char key, int x, int y)
@@ -316,11 +432,10 @@ static void on_keyboard(unsigned char key, int x, int y)
 
     case 'w':
 
-        if (!player_animation && tmp) {
-            
+        if (!player_animation && !block_keyboard) {
             player_animation = true;
             enemy_animation = true;
-            tmp = false;
+            block_keyboard = true;
 
             last = s.get_platform();
             next = s.next_platform();
@@ -328,17 +443,14 @@ static void on_keyboard(unsigned char key, int x, int y)
             if (last == next) {
                 player_animation = false;
                 enemy_animation = false;
-                tmp = true;
+                block_keyboard = false;
                 break;
             }
 
             if (s.get_platform() == &special) {
                 s.set_key(true);
+                p9.neighbours |= TOP;
                 cout << "Key" << endl;
-            }
-
-            if (s.get_platform() == &end_game && s.get_key()) {
-                cout << "End" << endl;
             }
             
             if (s.get_platform() == e1.get_platform() && !e1.get_dead()) {
@@ -358,19 +470,24 @@ static void on_keyboard(unsigned char key, int x, int y)
         }
         break;
 
-    case 's':
-        s.move_backward();
-        e1.next_position();
-        e2.next_position();
-        e3.next_position();
-        break;
-
     case 'a':
-        s.rotate_left();
+            if (!rotate_animation && !block_keyboard) {
+                s.rotate_left(true);
+
+                rotate_animation = true;
+                block_keyboard = true;
+                glutTimerFunc(15, on_timer_rotate_player, TIMER_ID1);
+            }
         break;
 
     case 'd':
-        s.rotate_right();
+            if (!rotate_animation && !block_keyboard) {
+
+                rotate_animation = true;
+                block_keyboard = true;
+                s.rotate_right(true);
+                glutTimerFunc(15, on_timer_rotate_player, TIMER_ID2);
+            }
         break;
 
     default:

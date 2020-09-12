@@ -14,7 +14,7 @@ public:
 	platform(int x, int y, int z, unsigned int n);
 
 	//metode
-	void draw_platform();
+	void draw_platform(int p);
     void set_neighbours(platform* lp_in, platform* rp_in, platform* tp_in, platform* bp_in);
     platform* get_neighbour(unsigned int side);
 
