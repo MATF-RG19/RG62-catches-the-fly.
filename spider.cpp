@@ -2,26 +2,37 @@
 #include <iostream>
 #include <cmath>
 
+void spider::init(platform * p) {
+    this->x_pos = 0;
+    this->y_pos = 0;
+    this->z_pos = 1;
+    
+    this->angle = 0;
+    
+    this->direction_coordinate_x = -T_VALUE;
+    this->direction_coordinate_y = 0;
+    
+    this->looking_at = 1;
+    
+    this->current_platform = p;
+
+    this->key = false;
+
+    this->dead = false;
+
+    this->rot = true;
+}
+
 spider::spider(platform * p) {
-    
-    x_pos = 0;
-    y_pos = 0;
-    z_pos = 1;
-    
-    angle = 0;
-    
-    direction_coordinate_x = -T_VALUE;
-    direction_coordinate_y = 0;
-    
-    looking_at = 1;
-    
-    current_platform = p;
+    init(p);
+}
 
-    key = false;
+void spider::reset(platform * p) {
+    init(p);
+}
 
-    dead = false;
-
-    bool rot = true;
+void spider::set_angle(double a) {
+    this->angle = a;
 }
 
 platform* spider::get_platform() {
@@ -41,6 +52,16 @@ bool spider::get_dead() {
 
 void spider::set_dead(bool d) {
     this->dead = d;
+}
+
+void spider::set_position(double x, double y, double z) {
+    this->x_pos = x;
+    this->y_pos = y;
+    this->z_pos = z;
+}
+
+void spider::set_platform(platform *p) {
+    this->current_platform = p;
 }
 
 //metod koji na osnovu informacije u kom smeru igrac gleda odredjuje vektor pravca

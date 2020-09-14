@@ -27,10 +27,14 @@ public:
     void set_dead(bool d);
     bool get_kill();
     void set_kill(bool k);
+    void init(double x, double y, double z, int pos, std::vector<platform*>& p, int d);
+    void reset(double x, double y, double z, int pos, std::vector<platform*>& p, int d);
 
     platform* get_platform();
 
     void tanslate();
+
+    void set_position(double x, double y, double z, int pos, int d);
 
     //polja
     double x_pos;

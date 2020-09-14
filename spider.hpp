@@ -38,6 +38,11 @@ public:
     void set_key(bool k);
     bool get_dead();
     void set_dead(bool d);
+    void set_position(double x, double y, double z);
+    void set_platform(platform *p);
+    void set_angle(double a);
+    void init(platform * p);
+    void reset(platform * p);
 
     //polja
     double x_pos;
@@ -53,7 +58,6 @@ public:
     unsigned int looking_at;
     bool dead;
     bool key;
-
     bool rot;
 	//destruktor
 	~spider();

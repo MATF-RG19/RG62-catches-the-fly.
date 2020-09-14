@@ -43,10 +43,19 @@ platform* platform::get_neighbour(unsigned int side) {
 void platform::draw_platform(int p) {
     
     glPushMatrix();
+    
         glColor3f(p, 0.5, 0.5);
         glTranslatef(this->x_pos, this->y_pos, this->z_pos);
-        glScalef(3.8, 3.8, 0.5);
-        glutSolidCube(1);
+        glScalef(3.9, 3.9, 1);
+
+        glBegin(GL_POLYGON);
+            glNormal3f(0, 0, 1);
+            glVertex3f(-0.5, -0.5, 0);
+            glVertex3f(0.5, -0.5, 0);
+            glVertex3f(0.5, 0.5, 0);
+            glVertex3f(-0.5, 0.5, 0);
+        glEnd();
+        
     glPopMatrix();
 }
 

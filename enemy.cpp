@@ -4,21 +4,26 @@
 enemy::enemy() {};
 
 enemy::enemy(double x, double y, double z, int pos, std::vector<platform*>& p, int d) {
-
-    x_pos = x;
-    y_pos = y;
-    z_pos = z;
-    position = pos;
-    direction = d;
-
-    platforms = p;
-
-    show = true;
-
-    kill = false;
-    is_dead = false;
+    init(x, y, z, pos, p, d);
 }
 
+void enemy::init(double x, double y, double z, int pos, std::vector<platform*>& p, int d) {
+    this->x_pos = x;
+    this->y_pos = y;
+    this->z_pos = z;
+    this->position = pos;
+    this->direction = d;
+
+    this->platforms = p;
+
+    this->show = true;
+    this->kill = false;
+    this->is_dead = false;
+}
+
+void enemy::reset(double x, double y, double z, int pos, std::vector<platform*>& p, int d) {
+    init(x, y, z, pos, p, d);
+}
 void enemy::draw_enemy() {
 
     if (show) {
@@ -62,6 +67,15 @@ void enemy::set_kill(bool k) {
 
 void enemy::tanslate() {
     this->y_pos += direction * 0.4;
+}
+
+void enemy::set_position(double x, double y, double z, int pos, int d) {
+    this->x_pos = x;
+    this->y_pos = y;
+    this->z_pos = z;
+
+    this->position = pos;
+    this->direction = d;
 }
 
 void enemy::next_position() {
