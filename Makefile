@@ -5,8 +5,8 @@ LDFLAGS = -L/usr/X11R6/lib -L/usr/pkg/lib
 LDLIBS  = -lglut -lGLU -lGL -lm
 
 
-$(PROGRAM): catch_the_fly.o spider.o platform.o enemy.o
-	$(CC) $(LDFLAGS) -o $(PROGRAM) catch_the_fly.o spider.o platform.o enemy.o $(LDLIBS)
+$(PROGRAM): catch_the_fly.o spider.o platform.o enemy.o image.o
+	$(CC) $(LDFLAGS) -o $(PROGRAM) catch_the_fly.o spider.o platform.o image.o enemy.o $(LDLIBS)
 
 .PHONY: clean dist
 

@@ -4,6 +4,8 @@
 
 #include "platform.hpp"
 #include <stdlib.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GL/glut.h>
 
 #define TOP 1
@@ -22,7 +24,7 @@ public:
 	spider(platform * p);
 
 	//metode
-	void draw_spider();
+	void draw_spider(GLUquadricObj *sphere, GLuint texture) ;
 
     void rotate_left(bool r);
 	void rotate_right(bool r);
@@ -52,6 +54,7 @@ public:
     
     double direction_coordinate_x;
     double direction_coordinate_y;
+    double a;
     
     double angle;
     
@@ -59,6 +62,7 @@ public:
     bool dead;
     bool key;
     bool rot;
+
 	//destruktor
 	~spider();
 };

@@ -7,6 +7,7 @@
 #include <vector>
 #include <unistd.h>
 
+#include "image.h"
 #include "spider.hpp"
 #include "platform.hpp"
 #include "enemy.hpp"
@@ -32,6 +33,11 @@ static void on_timer_rotate_player(int value);
 static void on_timer_gate(int value);
 static void on_timer(int value);
 
+static void initialize(void);
+
+// Identifikatori tekstura.
+static GLuint names[25];
+
 int angle = 0;
 float xPos = 0;
 float yPos = 0;
@@ -48,6 +54,8 @@ bool gate_down = false;
 double gate_parameter = 0;
 
 int key_angle = 0;
+
+GLUquadricObj *quadratic = gluNewQuadric();
 
 platform ordinary_platform1(-16,-8, 0, 0);
 platform ordinary_platform2(-16, -4, 0, 0);
@@ -100,11 +108,11 @@ int main(int argc, char **argv)
     glutReshapeFunc(on_reshape);
 
     glClearColor(0.52, 0.8, 0.92, 0);
+    
     glEnable(GL_DEPTH_TEST);
-
     glEnable(GL_COLOR_MATERIAL);
 
-    GLfloat light_position[] = {30, 150, -120, 0};
+    GLfloat light_position[] = {50, -50, 50, 0};
     GLfloat light_ambient[] = {0.5, 0.5, 0.5, 1};
     GLfloat light_diffuse[] = {0.5, 0.5, 0.5, 1};
     GLfloat light_specular[] = {0.5, 0.8, 0.5, 1};
@@ -142,10 +150,511 @@ int main(int argc, char **argv)
 
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+    initialize();
     glutMainLoop();
 
     return 0;
+}
+
+//funkcija po uzoru na funkciju inicijalizacije sa vezbi
+static void initialize(void)
+{
+    //instanciranje objekta tipa image
+    Image * image;
+
+    //glClearColor(0, 0, 0, 0);
+
+    glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_TEXTURE_2D);
+
+    glTexEnvf(GL_TEXTURE_ENV,
+              GL_TEXTURE_ENV_MODE,
+              GL_REPLACE);
+
+    
+    //inicijalizacija slike    
+    image = image_init(0, 0);
+
+    //trazimo da nam se obezbedi 1 id i smesti u niz names kako bismo koristili teksturu
+    //niz se nalazi na ovom mestu jer sam planirao da ubacim 2 teksture, od toga sam
+    //za sada odustao pa i nije neophodan niz, mogla je promenljiva
+    glGenTextures(25, names);
+
+    //ovde je bio problem konverzije string tipa u char*
+    //verovatno zbog toga sto je biblioteka image pisana u c-u
+    //kako bi radilo u image.c sam promenio da drugi argument fje image_read bude
+    //konstantan char*
+    //a onda sam na internetu pronasao metodu c_str() nad objektima tipa string
+    string s1 = "textures/cross.bmp";
+    image_read(image, s1.c_str());
+
+    
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[0]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+
+
+    std::string s2 = "textures/horizontal.bmp";
+    image_read(image, s2.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[1]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s3 = "textures/vertical.bmp";
+    image_read(image, s3.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[2]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s4 = "textures/top.bmp";
+    image_read(image, s4.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[3]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s5 = "textures/bottom.bmp";
+    image_read(image, s5.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[4]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s6 = "textures/left.bmp";
+    image_read(image, s6.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[5]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s7 = "textures/angle_t_l.bmp";
+    image_read(image, s7.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[6]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s8 = "textures/angle_b_r.bmp";
+    image_read(image, s8.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[7]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s9 = "textures/angle_b_l.bmp";
+    image_read(image, s9.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[8]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s10 = "textures/left_t.bmp";
+    image_read(image, s10.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[9]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s11 = "textures/top_t.bmp";
+    image_read(image, s11.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[10]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s12 = "textures/bottom_t.bmp";
+    image_read(image, s12.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[11]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s13 = "textures/right_t.bmp";
+    image_read(image, s13.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[12]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s14 = "textures/platform_front.bmp";
+    image_read(image, s14.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[13]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s15 = "textures/platform_side.bmp";
+    image_read(image, s15.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[14]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+     std::string s16 = "textures/base_top.bmp";
+    image_read(image, s16.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[15]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s17 = "textures/base_front_side.bmp";
+    image_read(image, s17.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[16]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s18 = "textures/bush_top.bmp";
+    image_read(image, s18.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[17]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s19 = "textures/bush_front.bmp";
+    image_read(image, s19.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[18]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s20 = "textures/bush_side.bmp";
+    image_read(image, s20.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[19]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s21 = "textures/spider_body.bmp";
+    image_read(image, s21.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[20]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s22 = "textures/key.bmp";
+    image_read(image, s22.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[21]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+
+    //uklanjamo dinamicki alociran objekat
+    image_done(image);
+
 }
 
 static void on_reshape(int width, int height)
@@ -154,55 +663,121 @@ static void on_reshape(int width, int height)
     window_height = height;
 }
 
-static void draw_parametrized_cube() {
+static void draw_parametrized_cube(GLuint front, GLuint top, GLuint side) {
 
-    glBegin(GL_POLYGON);
-        glNormal3f(0, 0, 1);
-        glVertex3f(0.5, -0.5, 0.5);
-        glVertex3f(0.5, -0.5, -0.5);
-        glVertex3f(-0.5, -0.5, -0.5);
-        glVertex3f(-0.5, -0.5, 0.5);
-    glEnd();
+    //right
+    glBindTexture(GL_TEXTURE_2D, side);
+        glBegin(GL_QUADS);
+            glNormal3f(0, -1, 0);
 
-    glBegin(GL_POLYGON);
-        glNormal3f(0, 0, 1);
-        glVertex3f(0.5, 0.5, 0.5);
-        glVertex3f(0.5, 0.5, -0.5);
-        glVertex3f(-0.5, 0.5, -0.5);
-        glVertex3f(-0.5, 0.5, 0.5);
-    glEnd();
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(0.5, -0.5, -0.5);
 
-    glBegin(GL_POLYGON);
-        glNormal3f(0, 0, 1);
-        glVertex3f(-0.5, -0.5, -0.5);
-        glVertex3f(0.5, -0.5, -0.5);
-        glVertex3f(0.5, 0.5, -0.5);
-        glVertex3f(-0.5, 0.5, -0.5);
-    glEnd();
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(-0.5, -0.5, -0.5);
 
-    glBegin(GL_POLYGON);
-        glNormal3f(0, 0, 1);
-        glVertex3f(-0.5, -0.5, 0.5);
-        glVertex3f(0.5, -0.5, 0.5);
-        glVertex3f(0.5, 0.5, 0.5);
-        glVertex3f(-0.5, 0.5, 0.5);
-    glEnd();
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(-0.5, -0.5, 0.5);
 
-    glBegin(GL_POLYGON);
-        glNormal3f(1, 0, 0);
-        glVertex3f(-0.5, -0.5, 0.5);
-        glVertex3f(-0.5, -0.5, -0.5);
-        glVertex3f(-0.5, 0.5, -0.5);
-        glVertex3f(-0.5, 0.5, 0.5);
-    glEnd();
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(0.5, -0.5, 0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
 
-    glBegin(GL_POLYGON);
-        glNormal3f(1, 0, 0);
-        glVertex3f(0.5, -0.5, 0.5);
-        glVertex3f(0.5, -0.5, -0.5);
-        glVertex3f(0.5, 0.5, -0.5);
-        glVertex3f(0.5, 0.5, 0.5);
-    glEnd();
+    //left
+    glBindTexture(GL_TEXTURE_2D, side);
+        glBegin(GL_QUADS);
+            glNormal3f(0, 1, 0);
+
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(0.5, 0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(-0.5, 0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(-0.5, 0.5, 0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(0.5, 0.5, 0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //bottom
+    glBindTexture(GL_TEXTURE_2D, top);
+        glBegin(GL_QUADS);
+            glNormal3f(0, 0, -1);
+
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(-0.5, -0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(0.5, -0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(0.5, 0.5, -0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(-0.5, 0.5, -0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //top
+    glBindTexture(GL_TEXTURE_2D, top);
+       glBegin(GL_QUADS);
+            glNormal3f(0, 0, 1);
+
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(0.5, -0.5, 0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(0.5, 0.5, 0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(-0.5, 0.5, 0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(-0.5, -0.5, 0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //back
+    glBindTexture(GL_TEXTURE_2D, front);
+        glBegin(GL_QUADS);
+            glNormal3f(-1, 0, 0);
+            
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(-0.5, -0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(-0.5, 0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(-0.5, 0.5, 0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(-0.5, -0.5, 0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //front
+    glBindTexture(GL_TEXTURE_2D, front);
+        glBegin(GL_QUADS);
+            glNormal3f(1, 0, 0);
+            
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(0.5, -0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(0.5, 0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(0.5, 0.5, 0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(0.5, -0.5, 0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 static void on_display(void)
@@ -221,19 +796,18 @@ static void on_display(void)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    //gluLookAt(-5, 5, 6, 0, 0, 0, 0, 0, 1);
     gluLookAt(15, 15, 15, -8, 0, 0, 0, 0, 1);
     //gluLookAt(s.x_pos + 15, s.y_pos + 15, 15, s.x_pos, s.y_pos, 0, 0, 0, 1);
-
-    GLUquadricObj *quadratic = gluNewQuadric();
 
     if (!s.get_key()) {
         glPushMatrix();
             glColor3f(1, 1, 0);
-            glTranslatef(0, -8, 1);
+            glTranslatef(0, -8, 2);
             glRotatef(key_angle, 0, 0, 1);
             glRotatef(-45, 0, 1 , 0);
             glRotatef(45, 1, 0, 0);
-            draw_parametrized_cube();
+            draw_parametrized_cube(names[21], names[21], names[21]);
         glPopMatrix();
     }
 
@@ -247,7 +821,7 @@ static void on_display(void)
     }
 
     glPushMatrix();
-        s.draw_spider();
+        s.draw_spider(quadratic, names[20]);
     glPopMatrix();
 
     //polja
@@ -256,150 +830,105 @@ static void on_display(void)
         e2.draw_enemy();
         e3.draw_enemy();
         
-        ordinary_platform1.draw_platform(1);
-        ordinary_platform2.draw_platform(1);
-        ordinary_platform3.draw_platform(1);
-        ordinary_platform4.draw_platform(1);
-        ordinary_platform5.draw_platform(1);
-        ordinary_platform6.draw_platform(1);
-        ordinary_platform7.draw_platform(1);
+        ordinary_platform1.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform2.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform3.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform4.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform5.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform6.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform7.draw_platform(names[14], names[13], names[14]);
 
-        p15.draw_platform(0);
-        p14.draw_platform(0);
-        p13.draw_platform(0);
-        p12.draw_platform(0);
-        p11.draw_platform(0);
-        p10.draw_platform(0);
-        p9.draw_platform(0);
-        p8.draw_platform(0);
-        p7.draw_platform(0);
-        p6.draw_platform(0);
-        p5.draw_platform(0);
-        p4.draw_platform(0);
-        p3.draw_platform(0);
-        p2.draw_platform(0);
-        p1.draw_platform(0);
+        p15.draw_platform(names[14], names[8], names[14]);
+        p14.draw_platform(names[14], names[7], names[14]);
+        p13.draw_platform(names[14], names[1], names[14]);
+        p12.draw_platform(names[14], names[2], names[14]);
+        p11.draw_platform(names[14], names[1], names[14]);
+        p10.draw_platform(names[14], names[12], names[14]);
+        p9.draw_platform(names[14], names[0], names[14]);
+        p8.draw_platform(names[14], names[5], names[14]);
+        p7.draw_platform(names[14], names[6], names[14]);
+        p6.draw_platform(names[14], names[11], names[14]);
+        p5.draw_platform(names[14], names[12], names[14]);
+        p4.draw_platform(names[14], names[10], names[14]);
+        p3.draw_platform(names[14], names[1], names[14]);
+        p2.draw_platform(names[14], names[10], names[14]);
+        p1.draw_platform(names[14], names[11], names[14]);
 
-        special.draw_platform(0);
-        end_game.draw_platform(0);
-        start.draw_platform(0);
+        special.draw_platform(names[14], names[3], names[14]);
+        end_game.draw_platform(names[14], names[4], names[14]);
+        start.draw_platform(names[14], names[3], names[14]);
 
     //ograda
     glPopMatrix();
 
     if (!gate_down) {
         glPushMatrix();
-            glColor3f(0, 0, 0);
+            glColor3f(0.86, 0.68, 0.30);
             glTranslatef(-14, 1.8, -gate_parameter);
             gluCylinder(quadratic, 0.2, 0.0, 1, 32, 32);
         glPopMatrix();
 
         glPushMatrix();
-            glColor3f(0, 0, 0);
+            glColor3f(0.86, 0.68, 0.30);
             glTranslatef(-14, 0.9, -gate_parameter);
             gluCylinder(quadratic, 0.2, 0.0, 1.5, 32, 32);
         glPopMatrix();
 
         glPushMatrix();
-            glColor3f(0, 0, 0);
+            glColor3f(0.86, 0.68, 0.30);
             glTranslatef(-14, 0, -gate_parameter);
             gluCylinder(quadratic, 0.2, 0.0, 2, 32, 32);
         glPopMatrix();
 
         glPushMatrix();
-            glColor3f(0, 0, 0);
+            glColor3f(0.86, 0.68, 0.30);
             glTranslatef(-14, -1.8, -gate_parameter);
             gluCylinder(quadratic, 0.2, 0.0, 1, 32, 32);
         glPopMatrix();
 
         glPushMatrix();
-            glColor3f(0, 0, 0);
+            glColor3f(0.86, 0.68, 0.30);
             glTranslatef(-14, -0.9, -gate_parameter);
             gluCylinder(quadratic, 0.2, 0.0, 1.5, 32, 32);
         glPopMatrix();
     }
     
-    //fontana
+    /*//fontana
     glPushMatrix();
         glColor3f(0, 1, 0.5);
         glTranslatef(0, -4, 0.5);
         glutSolidCone(1, 2, 20, 20);
-    glPopMatrix();
+    glPopMatrix();*/
 
     //zbunje
     glPushMatrix();
-        glColor3f(0, 1, 0);
-        glTranslatef(0, 6, 1);
-        glScalef(2, 6, 2);
-        draw_parametrized_cube();
+        //glColor3f(0, 1, 0);
+        glTranslatef(1, 6.5, 2);
+        glScalef(1.8, 5, 1.8);
+        draw_parametrized_cube(names[18], names[17], names[19]);
     glPopMatrix();
 
     glPushMatrix();
-        glColor3f(0, 1, 0);
-        glTranslatef(-16, 6, 1);
-        glScalef(2, 6, 2);
-        draw_parametrized_cube();
+        //glColor3f(0, 1, 0);
+        glTranslatef(-15, 6.5, 2);
+        glScalef(1.8, 5, 1.8);
+        draw_parametrized_cube(names[18], names[17], names[19]);
     glPopMatrix();
 
     glPushMatrix();
-        glColor3f(0, 1, 0);
-        glTranslatef(-16, -6, 1);
-        glScalef(2, 6, 2);
-        draw_parametrized_cube();
+        //glColor3f(0, 1, 0);
+        glTranslatef(-15, -5, 2);
+        glScalef(1.8, 5, 1.8);
+        draw_parametrized_cube(names[18], names[17], names[19]);
     glPopMatrix();
 
     //podloga
     glPushMatrix();
 
-        glColor3f(0.2, 0.2, 0.2);
-        glTranslatef(0, 0, -0.5);
+        glTranslatef(-8, 0, -0.4);
+        glScalef(22, 22, 1);
+        draw_parametrized_cube(names[16], names[15], names[16]);
 
-        glBegin(GL_POLYGON);
-            glNormal3f(0, 1, 0);
-            glVertex3f(3, 11, -1);
-            glVertex3f(3, 11, 0);
-            glVertex3f(-19, 11, 0);
-            glVertex3f(-19, 11, -1);
-        glEnd();
-        
-        glBegin(GL_POLYGON);
-            glNormal3f(1, 0, 0);
-            glVertex3f(3, -11, 0);
-            glVertex3f(3, -11, -1);
-            glVertex3f(3, 11, -1);
-            glVertex3f(3, 11, 0);
-        glEnd();
-
-        glTranslatef(-8, 0, 0);
-
-        glBegin(GL_POLYGON);
-            glNormal3f(0, 0, 1);
-            glVertex3f(-11, -11, 0);
-            glVertex3f(11, -11, 0);
-            glVertex3f(11, 11, 0);
-            glVertex3f(-11, 11, 0);
-        glEnd();
-
-    glPopMatrix();
-
-    //ivice table
-    glPushMatrix();
-        glColor3f(1, 1, 1);
-        glBegin(GL_POLYGON);
-            glNormal3f(0, 1, 0);
-            glVertex3f(2, 10, 0);
-            glVertex3f(2, 10, -0.5);
-            glVertex3f(-18, 10, -0.5);
-            glVertex3f(-18, 10, 0);
-        glEnd();
-
-        glBegin(GL_POLYGON);
-            glNormal3f(1, 0, 0);
-            glVertex3f(2, -10, 0);
-            glVertex3f(2, -10, -0.5);
-            glVertex3f(2, 10, -0.5);
-            glVertex3f(2, 10, 0);
-        glEnd();
     glPopMatrix();
 
     glutSwapBuffers();
@@ -460,7 +989,15 @@ static void on_timer_move_player(int value) {
     if (translation_value == 0) {
         player_animation = false;
         translation_value = 10;
-        activate_enemies();
+
+        if (s.get_platform() == &end_game && s.get_key()) {
+            block_keyboard = true;
+            show_fly = false;
+            cout << "End" << endl;
+        }
+        else {
+            activate_enemies();
+        }
     }
 
     if (player_animation) 
@@ -486,12 +1023,6 @@ static void on_timer_move_enemyes(int value) {
         player_animation = false;
         enemy_animation = false;
         block_keyboard = false;
-
-        if (s.get_platform() == &end_game && s.get_key()) {
-            block_keyboard = true;
-            show_fly = false;
-            cout << "End" << endl;
-        }
     }
 
     if (enemy_animation) 
