@@ -29,7 +29,6 @@ void enemy::draw_enemy(GLUquadricObj *sphere, GLuint texture) {
 
     if (show) {
         glPushMatrix();
-            //glColor3f(0, 0, 0);
             glTranslatef(this->x_pos, this->y_pos, this->z_pos);
             glScalef(0.8, 0.8, 1);
 
@@ -40,7 +39,6 @@ void enemy::draw_enemy(GLUquadricObj *sphere, GLuint texture) {
             gluSphere(sphere, 1, 20, 20);
         glPopMatrix();
     }
-
 }
 
 void enemy::next_position() {

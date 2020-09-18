@@ -97,9 +97,9 @@ vector<platform*> v2 = {&p10, &p6, &p4, &p8};
 vector<platform*> v3 = {&p14, &p11, &p9, &p13, &p15};
 
 //instanciranje neprijatelja
-enemy e1(-4, -4, 0, 1, v1, -1);
-enemy e2(-8, -4, 0, 1, v2, -1);
-enemy e3(-12, 4, 0, 3, v3, 1);
+enemy e1(-4, -4, 0.1, 1, v1, -1);
+enemy e2(-8, -4, 0.1, 1, v2, -1);
+enemy e3(-12, 4, 0.1, 3, v3, 1);
 
 int main(int argc, char **argv)
 {
@@ -293,45 +293,47 @@ static void on_display(void)
         start.draw_platform(names[14], names[3], names[14]);
     glPopMatrix();
 
-
+    //ograda
     glPushMatrix();
-        e1.draw_enemy(quadratic, names[0]);
-        e2.draw_enemy(quadratic, names[0]);
-        e3.draw_enemy(quadratic, names[0]);
+        if (!gate_down) {
+            glColor3f(0.86, 0.68, 0.30);
+            glPushMatrix();
+                glColor3f(0.86, 0.68, 0.30);
+                glTranslatef(-14, 1.8, -gate_parameter);
+                gluCylinder(quadratic, 0.2, 0.0, 1, 32, 32);
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3f(0.86, 0.68, 0.30);
+                glTranslatef(-14, 0.9, -gate_parameter);
+                gluCylinder(quadratic, 0.2, 0.0, 1.5, 32, 32);
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3f(0.86, 0.68, 0.30);
+                glTranslatef(-14, 0, -gate_parameter);
+                gluCylinder(quadratic, 0.2, 0.0, 2, 32, 32);
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3f(0.86, 0.68, 0.30);
+                glTranslatef(-14, -1.8, -gate_parameter);
+                gluCylinder(quadratic, 0.2, 0.0, 1, 32, 32);
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3f(0.86, 0.68, 0.30);
+                glTranslatef(-14, -0.9, -gate_parameter);
+                gluCylinder(quadratic, 0.2, 0.0, 1.5, 32, 32);
+            glPopMatrix();
+        }
     glPopMatrix();
 
-    //ograda
-    if (!gate_down) {
-        glPushMatrix();
-            glColor3f(0.86, 0.68, 0.30);
-            glTranslatef(-14, 1.8, -gate_parameter);
-            gluCylinder(quadratic, 0.2, 0.0, 1, 32, 32);
-        glPopMatrix();
-
-        glPushMatrix();
-            glColor3f(0.86, 0.68, 0.30);
-            glTranslatef(-14, 0.9, -gate_parameter);
-            gluCylinder(quadratic, 0.2, 0.0, 1.5, 32, 32);
-        glPopMatrix();
-
-        glPushMatrix();
-            glColor3f(0.86, 0.68, 0.30);
-            glTranslatef(-14, 0, -gate_parameter);
-            gluCylinder(quadratic, 0.2, 0.0, 2, 32, 32);
-        glPopMatrix();
-
-        glPushMatrix();
-            glColor3f(0.86, 0.68, 0.30);
-            glTranslatef(-14, -1.8, -gate_parameter);
-            gluCylinder(quadratic, 0.2, 0.0, 1, 32, 32);
-        glPopMatrix();
-
-        glPushMatrix();
-            glColor3f(0.86, 0.68, 0.30);
-            glTranslatef(-14, -0.9, -gate_parameter);
-            gluCylinder(quadratic, 0.2, 0.0, 1.5, 32, 32);
-        glPopMatrix();
-    }
+    glPushMatrix();
+        e1.draw_enemy(quadratic, names[22]);
+        e2.draw_enemy(quadratic, names[22]);
+        e3.draw_enemy(quadratic, names[22]);
+    glPopMatrix();
 
     //zbunje
     glPushMatrix();
@@ -1251,6 +1253,27 @@ static void initialize(void)
     //podesavanja teksture
     //pocinjemo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, names[21]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    //zavrsavamo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    std::string s23 = "textures/enemy.bmp";
+    image_read(image, s23.c_str());
+ 
+    //podesavanja teksture
+    //pocinjemo rad nad teksturom
+    glBindTexture(GL_TEXTURE_2D, names[22]);
     glTexParameteri(GL_TEXTURE_2D,
                     GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D,
