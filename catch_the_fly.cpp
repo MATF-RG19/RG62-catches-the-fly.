@@ -16,16 +16,16 @@
 #define TIMER_ID1 1
 #define TIMER_ID2 2
 #define TIMER_ID3 3
+
 using namespace std;
 
-static int window_width = 1000;
-static int window_height = 600;
+static int window_width = 1400;
+static int window_height = 800;
 
 static void on_display(void);
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 
-static void draw_level();
 static void on_timer_move_player(int value);
 static void on_timer_move_enemyes(int value);
 static void on_timer_move_enemy(int value);
@@ -34,8 +34,9 @@ static void on_timer_gate(int value);
 static void on_timer(int value);
 
 static void initialize(void);
+static void draw_parametrized_cube(GLuint front, GLuint top, GLuint side);
 
-// Identifikatori tekstura.
+//niz identifikatora tekstura
 static GLuint names[25];
 
 int angle = 0;
@@ -57,6 +58,7 @@ int key_angle = 0;
 
 GLUquadricObj *quadratic = gluNewQuadric();
 
+//platforme po kojima se igrac i neprijatelji ne krecu
 platform ordinary_platform1(-16,-8, 0, 0);
 platform ordinary_platform2(-16, -4, 0, 0);
 platform ordinary_platform3(-16, 4, 0, 0);
@@ -81,15 +83,20 @@ platform p3(-4, 4, 0, LEFT | RIGHT);
 platform p2(-4, -4, 0, TOP | LEFT | RIGHT);
 platform p1(-4, 0, 0, BOTTOM | LEFT | RIGHT);
 
+//posebne platforme
 platform special(0, -8, 0, TOP);
 platform end_game(-16, 0, 0, BOTTOM);
 platform start(0, 0, 0, TOP);
 
+//instanciranje igraca
 spider s(&start);
 
+//niz sa platformama po kojima se krece neprijatelj
 vector<platform*> v1 = {&p5, &p2, &p1, &p3, &p7};
 vector<platform*> v2 = {&p10, &p6, &p4, &p8};
 vector<platform*> v3 = {&p14, &p11, &p9, &p13, &p15};
+
+//instanciranje neprijatelja
 enemy e1(-4, -4, 0, 1, v1, -1);
 enemy e2(-8, -4, 0, 1, v2, -1);
 enemy e3(-12, 4, 0, 3, v3, 1);
@@ -112,7 +119,7 @@ int main(int argc, char **argv)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_COLOR_MATERIAL);
 
-    GLfloat light_position[] = {50, -50, 50, 0};
+    GLfloat light_position[] = {-50, -50, 50, 0};
     GLfloat light_ambient[] = {0.5, 0.5, 0.5, 1};
     GLfloat light_diffuse[] = {0.5, 0.5, 0.5, 1};
     GLfloat light_specular[] = {0.5, 0.8, 0.5, 1};
@@ -150,11 +157,619 @@ int main(int argc, char **argv)
 
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //inicijalizacija tekstura
     initialize();
     glutMainLoop();
 
     return 0;
 }
+
+static void on_reshape(int width, int height)
+{
+    window_width = width;
+    window_height = height;
+}
+
+static void on_display(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glViewport(0, 0, window_width, window_height);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60, (float)window_width / window_height, 1, 1500);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    gluLookAt(15, 15, 15, -8, 0, 0, 0, 0, 1);
+
+    if (!s.get_key()) {
+        glPushMatrix();
+            glColor3f(1, 1, 0);
+            glTranslatef(0, -8, 2);
+            glRotatef(key_angle, 0, 0, 1);
+            glRotatef(-45, 0, 1 , 0);
+            glRotatef(45, 1, 0, 0);
+            draw_parametrized_cube(names[21], names[21], names[21]);
+        glPopMatrix();
+    }
+
+    if (show_fly) {
+        glPushMatrix();
+            glTranslatef(-16, 0, 2.5);
+            glRotatef(-10, 0, 1, 0);
+            
+            //krila
+            glPushMatrix();
+
+                glColor3f(1, 1, 1);
+                glTranslatef(0.1, 0.06, 0.5);
+                glRotatef(5, 1, 0, 0);
+                glScalef(0.25, 0.25, 0.25);
+                
+                glBegin(GL_POLYGON);
+                    glVertex3f(0, 0, 0);
+                    glVertex3f(0, 0.5, 0.7);
+                    glVertex3f(0, 2, -1);
+                    glVertex3f(0, 2, -3);
+                    glVertex3f(0, 1, -2.5);
+                glEnd();
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3f(1, 1, 1);
+                glTranslatef(0.1, -0.06, 0.5);
+                glRotatef(-5, 1, 0, 0);
+                glScalef(0.25, 0.25, 0.25);
+                
+                glBegin(GL_POLYGON);
+                    glVertex3f(0, 0, 0);
+                    glVertex3f(0, -0.5, 0.7);
+                    glVertex3f(0, -2, -1);
+                    glVertex3f(0, -2, -3);
+                    glVertex3f(0, -1, -2.5);
+                glEnd();
+            glPopMatrix();
+
+            //telo
+            glTranslatef(0, 0, 0.22);
+            glScalef(0.6, 0.6, 0.6);
+            
+            glPushMatrix();    
+                glColor3f(0.2, 0, 0.2);
+                glTranslatef(0, 0, 0.65);
+                gluSphere(quadratic, 0.1, 10, 10);
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3f(0.86, 0.68, 0.30);
+                glTranslatef(0, 0, 0.45);
+                gluSphere(quadratic, 0.2, 10, 10);
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3f(0.2, 0.2, 0.2);
+                glScalef(1, 0.8, 1.3);
+                gluSphere(quadratic, 0.3, 10, 10);
+            glPopMatrix();
+        glPopMatrix();
+    }
+
+    glPushMatrix();
+        s.draw_spider(quadratic, names[20]);
+    glPopMatrix();
+
+    //platforme
+    glPopMatrix();
+        ordinary_platform1.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform2.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform3.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform4.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform5.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform6.draw_platform(names[14], names[13], names[14]);
+        ordinary_platform7.draw_platform(names[14], names[13], names[14]);
+
+        p15.draw_platform(names[14], names[8], names[14]);
+        p14.draw_platform(names[14], names[7], names[14]);
+        p13.draw_platform(names[14], names[1], names[14]);
+        p12.draw_platform(names[14], names[2], names[14]);
+        p11.draw_platform(names[14], names[1], names[14]);
+        p10.draw_platform(names[14], names[12], names[14]);
+        p9.draw_platform(names[14], names[0], names[14]);
+        p8.draw_platform(names[14], names[5], names[14]);
+        p7.draw_platform(names[14], names[6], names[14]);
+        p6.draw_platform(names[14], names[11], names[14]);
+        p5.draw_platform(names[14], names[12], names[14]);
+        p4.draw_platform(names[14], names[10], names[14]);
+        p3.draw_platform(names[14], names[1], names[14]);
+        p2.draw_platform(names[14], names[10], names[14]);
+        p1.draw_platform(names[14], names[11], names[14]);
+
+        special.draw_platform(names[14], names[3], names[14]);
+        end_game.draw_platform(names[14], names[4], names[14]);
+        start.draw_platform(names[14], names[3], names[14]);
+    glPopMatrix();
+
+
+    glPushMatrix();
+        e1.draw_enemy(quadratic, names[0]);
+        e2.draw_enemy(quadratic, names[0]);
+        e3.draw_enemy(quadratic, names[0]);
+    glPopMatrix();
+
+    //ograda
+    if (!gate_down) {
+        glPushMatrix();
+            glColor3f(0.86, 0.68, 0.30);
+            glTranslatef(-14, 1.8, -gate_parameter);
+            gluCylinder(quadratic, 0.2, 0.0, 1, 32, 32);
+        glPopMatrix();
+
+        glPushMatrix();
+            glColor3f(0.86, 0.68, 0.30);
+            glTranslatef(-14, 0.9, -gate_parameter);
+            gluCylinder(quadratic, 0.2, 0.0, 1.5, 32, 32);
+        glPopMatrix();
+
+        glPushMatrix();
+            glColor3f(0.86, 0.68, 0.30);
+            glTranslatef(-14, 0, -gate_parameter);
+            gluCylinder(quadratic, 0.2, 0.0, 2, 32, 32);
+        glPopMatrix();
+
+        glPushMatrix();
+            glColor3f(0.86, 0.68, 0.30);
+            glTranslatef(-14, -1.8, -gate_parameter);
+            gluCylinder(quadratic, 0.2, 0.0, 1, 32, 32);
+        glPopMatrix();
+
+        glPushMatrix();
+            glColor3f(0.86, 0.68, 0.30);
+            glTranslatef(-14, -0.9, -gate_parameter);
+            gluCylinder(quadratic, 0.2, 0.0, 1.5, 32, 32);
+        glPopMatrix();
+    }
+
+    //zbunje
+    glPushMatrix();
+        glTranslatef(1, 6.5, 2);
+        glScalef(1.8, 5, 1.8);
+        draw_parametrized_cube(names[18], names[17], names[19]);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(-15, 6.5, 2);
+        glScalef(1.8, 5, 1.8);
+        draw_parametrized_cube(names[18], names[17], names[19]);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(-15, -5, 2);
+        glScalef(1.8, 5, 1.8);
+        draw_parametrized_cube(names[18], names[17], names[19]);
+    glPopMatrix();
+
+    //podloga
+    glPushMatrix();
+        glTranslatef(-8, 0, -0.4);
+        glScalef(22, 22, 1);
+        draw_parametrized_cube(names[16], names[15], names[16]);
+    glPopMatrix();
+
+    glutSwapBuffers();
+}
+
+void activate_enemies() {
+
+    if (!e1.get_dead()) {
+        e1.next_position();
+        if (e1.get_platform() == s.get_platform()) {
+            s.set_dead(true);
+            glutTimerFunc(15, on_timer_move_enemy, TIMER_ID1);
+            return;
+        }
+    }
+    if (!e2.get_dead()) {
+        e2.next_position();
+        if (e2.get_platform() == s.get_platform()) {
+            s.set_dead(true);
+            glutTimerFunc(15, on_timer_move_enemy, TIMER_ID2);
+            return;
+        }
+    }
+    if (!e3.get_dead()) {
+        e3.next_position();
+        if (e3.get_platform() == s.get_platform()) {
+            s.set_dead(true);
+            glutTimerFunc(15, on_timer_move_enemy, TIMER_ID3);
+            return;
+        }
+    }
+
+    glutTimerFunc(15, on_timer_move_enemyes, TIMER_ID);
+}
+
+static void on_timer_move_player(int value) {
+
+    if (value != TIMER_ID) {
+        return;
+    }
+
+    s.move_forward();
+
+    if (e1.get_kill()) {
+        e1.set_show(false);
+    }
+    if (e2.get_kill()) {
+        e2.set_show(false);
+    }
+    if (e3.get_kill()) {
+        e3.set_show(false);
+    }
+
+    glutPostRedisplay();
+
+    translation_value--;
+
+    if (translation_value == 0) {
+        player_animation = false;
+        translation_value = 10;
+
+        if (s.get_platform() == &end_game && s.get_key()) {
+            block_keyboard = true;
+            show_fly = false;
+            //cout << "End" << endl;
+        }
+        else {
+            activate_enemies();
+        }
+    }
+
+    if (player_animation) 
+        glutTimerFunc(15, on_timer_move_player, TIMER_ID);
+}
+
+static void on_timer_move_enemyes(int value) {
+
+    if (value != TIMER_ID) {
+        return;
+    }
+
+    e1.tanslate();
+    e2.tanslate();
+    e3.tanslate();
+
+    glutPostRedisplay();
+
+    translation_value--;
+
+    if (translation_value == 0) {
+        translation_value = 10;
+        player_animation = false;
+        enemy_animation = false;
+        block_keyboard = false;
+    }
+
+    if (enemy_animation) 
+        glutTimerFunc(15, on_timer_move_enemyes, TIMER_ID);
+}
+
+static void on_timer_move_enemy(int value) {
+
+    if (value == TIMER_ID1) {
+        e1.tanslate();
+    }
+    if (value == TIMER_ID2) {
+        e2.tanslate();
+    }
+    if (value == TIMER_ID3) {
+        e3.tanslate();
+    }
+
+    glutPostRedisplay();
+
+    translation_value--;
+
+    if (translation_value == 0) {
+        translation_value = 10;
+        player_animation = false;
+        enemy_animation = false;
+        block_keyboard = true;
+        s.set_dead(true);
+    }
+
+    if (enemy_animation) 
+        glutTimerFunc(15, on_timer_move_enemy, value);
+}
+
+static void on_timer_rotate_player(int value) {
+
+    if (value == TIMER_ID1) {
+        s.rotate_left(false);
+    }
+    else {
+        s.rotate_right(false);
+    }
+
+    glutPostRedisplay();
+
+    translation_value--;
+
+    if (translation_value == 0) {
+        translation_value = 10;
+        rotate_animation = false;
+        block_keyboard = false;
+    }
+
+    if (rotate_animation) 
+        glutTimerFunc(15, on_timer_rotate_player, value);
+}
+
+static void on_timer_gate(int value) {
+
+    if (value != TIMER_ID) {
+        return;
+    }
+
+    gate_parameter += 0.1;
+
+    if (gate_parameter > 3)
+        gate_down = true;
+
+    if(!gate_down)
+        glutTimerFunc(15, on_timer_gate, value);
+}
+
+static void on_timer(int value) {
+
+    if (value != TIMER_ID) {
+        return;
+    }
+
+    key_angle += 4;
+
+    key_angle %= 360;
+
+    glutPostRedisplay();
+
+    if(!s.get_key())
+        glutTimerFunc(100, on_timer, value);
+}
+
+static void on_keyboard(unsigned char key, int x, int y)
+{
+
+    platform* last = nullptr;
+    platform* next = nullptr;
+    
+    switch (key)
+    {
+
+    case 27:
+        exit(0);
+        break;
+    
+    case 'w':
+
+        if (!player_animation && !block_keyboard) {
+            player_animation = true;
+            enemy_animation = true;
+            block_keyboard = true;
+
+            last = s.get_platform();
+            next = s.next_platform();
+
+            if (last == next) {
+                player_animation = false;
+                enemy_animation = false;
+                block_keyboard = false;
+                break;
+            }
+
+            if (s.get_platform() == &special) {
+                s.set_key(true);
+                p9.neighbours |= TOP;
+                glutTimerFunc(30, on_timer_gate, TIMER_ID);
+                //cout << "Key" << endl;
+            }
+            
+            if (s.get_platform() == e1.get_platform() && !e1.get_dead()) {
+                e1.set_dead(true);
+                e1.set_kill(true);
+            }
+            if (s.get_platform() == e2.get_platform() && !e2.get_dead()) {
+                e2.set_dead(true);
+                e2.set_kill(true);
+            }
+            if (s.get_platform() == e3.get_platform() && !e3.get_dead()) {
+                e3.set_dead(true);
+                e3.set_kill(true);
+            }
+            
+            glutTimerFunc(15, on_timer_move_player, TIMER_ID);
+        }
+        break;
+
+    case 'a':
+            if (!rotate_animation && !block_keyboard) {
+                s.rotate_left(true);
+
+                rotate_animation = true;
+                block_keyboard = true;
+                glutTimerFunc(15, on_timer_rotate_player, TIMER_ID1);
+            }
+        break;
+
+    case 'd':
+            if (!rotate_animation && !block_keyboard) {
+
+                rotate_animation = true;
+                block_keyboard = true;
+                s.rotate_right(true);
+                glutTimerFunc(15, on_timer_rotate_player, TIMER_ID2);
+            }
+        break;
+    case 'r' :
+            //postavljanje svih vrednosti na podrazumevane
+            angle = 0;
+            xPos = 0;
+            yPos = 0;
+            player_animation = false;
+            rotate_animation = false;
+            enemy_animation = false;
+            translation_value = 10;
+            block_keyboard = false;
+            show_fly = true;
+
+            gate_down = false;
+            gate_parameter = 0;
+
+            key_angle = 0;
+            
+            e1.reset(-4, -4, 0, 1, v1, -1);
+            e2.reset(-8, -4, 0, 1, v2, -1);
+            e3.reset(-12, 4, 0, 3, v3, 1);
+
+            s.reset(&start);
+
+            p9.neighbours = p9.neighbours & ~TOP;
+        break;
+    default:
+        break;
+    }
+
+    glutPostRedisplay();
+}
+
+//parametrizacija kocke
+static void draw_parametrized_cube(GLuint front, GLuint top, GLuint side) {
+
+    //right
+    glBindTexture(GL_TEXTURE_2D, side);
+        glBegin(GL_QUADS);
+            glNormal3f(0, -1, 0);
+
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(0.5, -0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(-0.5, -0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(-0.5, -0.5, 0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(0.5, -0.5, 0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //left
+    glBindTexture(GL_TEXTURE_2D, side);
+        glBegin(GL_QUADS);
+            glNormal3f(0, 1, 0);
+
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(0.5, 0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(-0.5, 0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(-0.5, 0.5, 0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(0.5, 0.5, 0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //bottom
+    glBindTexture(GL_TEXTURE_2D, top);
+        glBegin(GL_QUADS);
+            glNormal3f(0, 0, -1);
+
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(-0.5, -0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(0.5, -0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(0.5, 0.5, -0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(-0.5, 0.5, -0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //top
+    glBindTexture(GL_TEXTURE_2D, top);
+       glBegin(GL_QUADS);
+            glNormal3f(0, 0, 1);
+
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(0.5, -0.5, 0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(0.5, 0.5, 0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(-0.5, 0.5, 0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(-0.5, -0.5, 0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //back
+    glBindTexture(GL_TEXTURE_2D, front);
+        glBegin(GL_QUADS);
+            glNormal3f(-1, 0, 0);
+            
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(-0.5, -0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(-0.5, 0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(-0.5, 0.5, 0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(-0.5, -0.5, 0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //front
+    glBindTexture(GL_TEXTURE_2D, front);
+        glBegin(GL_QUADS);
+            glNormal3f(1, 0, 0);
+            
+            glTexCoord2f(0.1, 0.1);
+            glVertex3f(0.5, -0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.1);
+            glVertex3f(0.5, 0.5, -0.5);
+
+            glTexCoord2f(0.9, 0.9);
+            glVertex3f(0.5, 0.5, 0.5);
+
+            glTexCoord2f(0.1, 0.9);
+            glVertex3f(0.5, -0.5, 0.5);
+        glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+/**************************************/
+/*
+*Kod preuzet od Davida Nestorovica
+*github: https://github.com/dnestorovic
+*/
+/*************************************/
+
 
 //funkcija po uzoru na funkciju inicijalizacije sa vezbi
 static void initialize(void)
@@ -655,567 +1270,4 @@ static void initialize(void)
     //uklanjamo dinamicki alociran objekat
     image_done(image);
 
-}
-
-static void on_reshape(int width, int height)
-{
-    window_width = width;
-    window_height = height;
-}
-
-static void draw_parametrized_cube(GLuint front, GLuint top, GLuint side) {
-
-    //right
-    glBindTexture(GL_TEXTURE_2D, side);
-        glBegin(GL_QUADS);
-            glNormal3f(0, -1, 0);
-
-            glTexCoord2f(0.1, 0.1);
-            glVertex3f(0.5, -0.5, -0.5);
-
-            glTexCoord2f(0.9, 0.1);
-            glVertex3f(-0.5, -0.5, -0.5);
-
-            glTexCoord2f(0.9, 0.9);
-            glVertex3f(-0.5, -0.5, 0.5);
-
-            glTexCoord2f(0.1, 0.9);
-            glVertex3f(0.5, -0.5, 0.5);
-        glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    //left
-    glBindTexture(GL_TEXTURE_2D, side);
-        glBegin(GL_QUADS);
-            glNormal3f(0, 1, 0);
-
-            glTexCoord2f(0.1, 0.1);
-            glVertex3f(0.5, 0.5, -0.5);
-
-            glTexCoord2f(0.9, 0.1);
-            glVertex3f(-0.5, 0.5, -0.5);
-
-            glTexCoord2f(0.9, 0.9);
-            glVertex3f(-0.5, 0.5, 0.5);
-
-            glTexCoord2f(0.1, 0.9);
-            glVertex3f(0.5, 0.5, 0.5);
-        glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    //bottom
-    glBindTexture(GL_TEXTURE_2D, top);
-        glBegin(GL_QUADS);
-            glNormal3f(0, 0, -1);
-
-            glTexCoord2f(0.1, 0.1);
-            glVertex3f(-0.5, -0.5, -0.5);
-
-            glTexCoord2f(0.9, 0.1);
-            glVertex3f(0.5, -0.5, -0.5);
-
-            glTexCoord2f(0.9, 0.9);
-            glVertex3f(0.5, 0.5, -0.5);
-
-            glTexCoord2f(0.1, 0.9);
-            glVertex3f(-0.5, 0.5, -0.5);
-        glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    //top
-    glBindTexture(GL_TEXTURE_2D, top);
-       glBegin(GL_QUADS);
-            glNormal3f(0, 0, 1);
-
-            glTexCoord2f(0.1, 0.1);
-            glVertex3f(0.5, -0.5, 0.5);
-
-            glTexCoord2f(0.9, 0.1);
-            glVertex3f(0.5, 0.5, 0.5);
-
-            glTexCoord2f(0.9, 0.9);
-            glVertex3f(-0.5, 0.5, 0.5);
-
-            glTexCoord2f(0.1, 0.9);
-            glVertex3f(-0.5, -0.5, 0.5);
-        glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    //back
-    glBindTexture(GL_TEXTURE_2D, front);
-        glBegin(GL_QUADS);
-            glNormal3f(-1, 0, 0);
-            
-            glTexCoord2f(0.1, 0.1);
-            glVertex3f(-0.5, -0.5, -0.5);
-
-            glTexCoord2f(0.9, 0.1);
-            glVertex3f(-0.5, 0.5, -0.5);
-
-            glTexCoord2f(0.9, 0.9);
-            glVertex3f(-0.5, 0.5, 0.5);
-
-            glTexCoord2f(0.1, 0.9);
-            glVertex3f(-0.5, -0.5, 0.5);
-        glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    //front
-    glBindTexture(GL_TEXTURE_2D, front);
-        glBegin(GL_QUADS);
-            glNormal3f(1, 0, 0);
-            
-            glTexCoord2f(0.1, 0.1);
-            glVertex3f(0.5, -0.5, -0.5);
-
-            glTexCoord2f(0.9, 0.1);
-            glVertex3f(0.5, 0.5, -0.5);
-
-            glTexCoord2f(0.9, 0.9);
-            glVertex3f(0.5, 0.5, 0.5);
-
-            glTexCoord2f(0.1, 0.9);
-            glVertex3f(0.5, -0.5, 0.5);
-        glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-static void on_display(void)
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glViewport(0, 0, window_width, window_height);
-
-    /*glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glFrustum(-1 ,1, -1, 1, 0.9, 7);*/
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(60, (float)window_width / window_height, 1, 1500);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    //gluLookAt(-5, 5, 6, 0, 0, 0, 0, 0, 1);
-    gluLookAt(15, 15, 15, -8, 0, 0, 0, 0, 1);
-    //gluLookAt(s.x_pos + 15, s.y_pos + 15, 15, s.x_pos, s.y_pos, 0, 0, 0, 1);
-
-    if (!s.get_key()) {
-        glPushMatrix();
-            glColor3f(1, 1, 0);
-            glTranslatef(0, -8, 2);
-            glRotatef(key_angle, 0, 0, 1);
-            glRotatef(-45, 0, 1 , 0);
-            glRotatef(45, 1, 0, 0);
-            draw_parametrized_cube(names[21], names[21], names[21]);
-        glPopMatrix();
-    }
-
-    if (show_fly) {
-        glPushMatrix();
-            glTranslatef(-16, 0, 2);
-            glRotatef(-10, 0, 1, 0);
-            glColor3f(1, 0, 0);
-            glutSolidCube(1);
-        glPopMatrix();
-    }
-
-    glPushMatrix();
-        s.draw_spider(quadratic, names[20]);
-    glPopMatrix();
-
-    //polja
-    glPushMatrix();
-        e1.draw_enemy();
-        e2.draw_enemy();
-        e3.draw_enemy();
-        
-        ordinary_platform1.draw_platform(names[14], names[13], names[14]);
-        ordinary_platform2.draw_platform(names[14], names[13], names[14]);
-        ordinary_platform3.draw_platform(names[14], names[13], names[14]);
-        ordinary_platform4.draw_platform(names[14], names[13], names[14]);
-        ordinary_platform5.draw_platform(names[14], names[13], names[14]);
-        ordinary_platform6.draw_platform(names[14], names[13], names[14]);
-        ordinary_platform7.draw_platform(names[14], names[13], names[14]);
-
-        p15.draw_platform(names[14], names[8], names[14]);
-        p14.draw_platform(names[14], names[7], names[14]);
-        p13.draw_platform(names[14], names[1], names[14]);
-        p12.draw_platform(names[14], names[2], names[14]);
-        p11.draw_platform(names[14], names[1], names[14]);
-        p10.draw_platform(names[14], names[12], names[14]);
-        p9.draw_platform(names[14], names[0], names[14]);
-        p8.draw_platform(names[14], names[5], names[14]);
-        p7.draw_platform(names[14], names[6], names[14]);
-        p6.draw_platform(names[14], names[11], names[14]);
-        p5.draw_platform(names[14], names[12], names[14]);
-        p4.draw_platform(names[14], names[10], names[14]);
-        p3.draw_platform(names[14], names[1], names[14]);
-        p2.draw_platform(names[14], names[10], names[14]);
-        p1.draw_platform(names[14], names[11], names[14]);
-
-        special.draw_platform(names[14], names[3], names[14]);
-        end_game.draw_platform(names[14], names[4], names[14]);
-        start.draw_platform(names[14], names[3], names[14]);
-
-    //ograda
-    glPopMatrix();
-
-    if (!gate_down) {
-        glPushMatrix();
-            glColor3f(0.86, 0.68, 0.30);
-            glTranslatef(-14, 1.8, -gate_parameter);
-            gluCylinder(quadratic, 0.2, 0.0, 1, 32, 32);
-        glPopMatrix();
-
-        glPushMatrix();
-            glColor3f(0.86, 0.68, 0.30);
-            glTranslatef(-14, 0.9, -gate_parameter);
-            gluCylinder(quadratic, 0.2, 0.0, 1.5, 32, 32);
-        glPopMatrix();
-
-        glPushMatrix();
-            glColor3f(0.86, 0.68, 0.30);
-            glTranslatef(-14, 0, -gate_parameter);
-            gluCylinder(quadratic, 0.2, 0.0, 2, 32, 32);
-        glPopMatrix();
-
-        glPushMatrix();
-            glColor3f(0.86, 0.68, 0.30);
-            glTranslatef(-14, -1.8, -gate_parameter);
-            gluCylinder(quadratic, 0.2, 0.0, 1, 32, 32);
-        glPopMatrix();
-
-        glPushMatrix();
-            glColor3f(0.86, 0.68, 0.30);
-            glTranslatef(-14, -0.9, -gate_parameter);
-            gluCylinder(quadratic, 0.2, 0.0, 1.5, 32, 32);
-        glPopMatrix();
-    }
-    
-    /*//fontana
-    glPushMatrix();
-        glColor3f(0, 1, 0.5);
-        glTranslatef(0, -4, 0.5);
-        glutSolidCone(1, 2, 20, 20);
-    glPopMatrix();*/
-
-    //zbunje
-    glPushMatrix();
-        //glColor3f(0, 1, 0);
-        glTranslatef(1, 6.5, 2);
-        glScalef(1.8, 5, 1.8);
-        draw_parametrized_cube(names[18], names[17], names[19]);
-    glPopMatrix();
-
-    glPushMatrix();
-        //glColor3f(0, 1, 0);
-        glTranslatef(-15, 6.5, 2);
-        glScalef(1.8, 5, 1.8);
-        draw_parametrized_cube(names[18], names[17], names[19]);
-    glPopMatrix();
-
-    glPushMatrix();
-        //glColor3f(0, 1, 0);
-        glTranslatef(-15, -5, 2);
-        glScalef(1.8, 5, 1.8);
-        draw_parametrized_cube(names[18], names[17], names[19]);
-    glPopMatrix();
-
-    //podloga
-    glPushMatrix();
-
-        glTranslatef(-8, 0, -0.4);
-        glScalef(22, 22, 1);
-        draw_parametrized_cube(names[16], names[15], names[16]);
-
-    glPopMatrix();
-
-    glutSwapBuffers();
-}
-
-void activate_enemies() {
-
-    if (!e1.get_dead()) {
-        e1.next_position();
-        if (e1.get_platform() == s.get_platform()) {
-            s.set_dead(true);
-            glutTimerFunc(15, on_timer_move_enemy, TIMER_ID1);
-            return;
-        }
-    }
-    if (!e2.get_dead()) {
-        e2.next_position();
-        if (e2.get_platform() == s.get_platform()) {
-            s.set_dead(true);
-            glutTimerFunc(15, on_timer_move_enemy, TIMER_ID2);
-            return;
-        }
-    }
-    if (!e3.get_dead()) {
-        e3.next_position();
-        if (e3.get_platform() == s.get_platform()) {
-            s.set_dead(true);
-            glutTimerFunc(15, on_timer_move_enemy, TIMER_ID3);
-            return;
-        }
-    }
-
-    glutTimerFunc(15, on_timer_move_enemyes, TIMER_ID);
-}
-
-static void on_timer_move_player(int value) {
-
-    if (value != TIMER_ID) {
-        return;
-    }
-
-    s.move_forward();
-
-    if (e1.get_kill()) {
-        e1.set_show(false);
-    }
-    if (e2.get_kill()) {
-        e2.set_show(false);
-    }
-    if (e3.get_kill()) {
-        e3.set_show(false);
-    }
-
-    glutPostRedisplay();
-
-    translation_value--;
-
-    if (translation_value == 0) {
-        player_animation = false;
-        translation_value = 10;
-
-        if (s.get_platform() == &end_game && s.get_key()) {
-            block_keyboard = true;
-            show_fly = false;
-            cout << "End" << endl;
-        }
-        else {
-            activate_enemies();
-        }
-    }
-
-    if (player_animation) 
-        glutTimerFunc(15, on_timer_move_player, TIMER_ID);
-}
-
-static void on_timer_move_enemyes(int value) {
-
-    if (value != TIMER_ID) {
-        return;
-    }
-
-    e1.tanslate();
-    e2.tanslate();
-    e3.tanslate();
-
-    glutPostRedisplay();
-
-    translation_value--;
-
-    if (translation_value == 0) {
-        translation_value = 10;
-        player_animation = false;
-        enemy_animation = false;
-        block_keyboard = false;
-    }
-
-    if (enemy_animation) 
-        glutTimerFunc(15, on_timer_move_enemyes, TIMER_ID);
-}
-
-static void on_timer_move_enemy(int value) {
-
-    if (value == TIMER_ID1) {
-        e1.tanslate();
-    }
-    if (value == TIMER_ID2) {
-        e2.tanslate();
-    }
-    if (value == TIMER_ID3) {
-        e3.tanslate();
-    }
-
-    glutPostRedisplay();
-
-    translation_value--;
-
-    if (translation_value == 0) {
-        translation_value = 10;
-        player_animation = false;
-        enemy_animation = false;
-        block_keyboard = true;
-        s.set_dead(true);
-    }
-
-    if (enemy_animation) 
-        glutTimerFunc(15, on_timer_move_enemy, value);
-}
-
-static void on_timer_rotate_player(int value) {
-
-    if (value == TIMER_ID1) {
-        s.rotate_left(false);
-    }
-    else {
-        s.rotate_right(false);
-    }
-
-    glutPostRedisplay();
-
-    translation_value--;
-
-    if (translation_value == 0) {
-        translation_value = 10;
-        rotate_animation = false;
-        block_keyboard = false;
-    }
-
-    if (rotate_animation) 
-        glutTimerFunc(15, on_timer_rotate_player, value);
-}
-
-static void on_timer_gate(int value) {
-
-    if (value != TIMER_ID) {
-        return;
-    }
-
-    gate_parameter += 0.1;
-
-    if (gate_parameter > 3)
-        gate_down = true;
-
-    if(!gate_down)
-        glutTimerFunc(15, on_timer_gate, value);
-}
-
-static void on_timer(int value) {
-
-    if (value != TIMER_ID) {
-        return;
-    }
-
-    key_angle += 4;
-
-    key_angle %= 360;
-
-    glutPostRedisplay();
-
-    if(!s.get_key())
-        glutTimerFunc(100, on_timer, value);
-}
-
-static void on_keyboard(unsigned char key, int x, int y)
-{
-
-    platform* last = nullptr;
-    platform* next = nullptr;
-    
-    switch (key)
-    {
-
-    case 27:
-        exit(0);
-        break;
-
-    case 'w':
-
-        if (!player_animation && !block_keyboard) {
-            player_animation = true;
-            enemy_animation = true;
-            block_keyboard = true;
-
-            last = s.get_platform();
-            next = s.next_platform();
-
-            if (last == next) {
-                player_animation = false;
-                enemy_animation = false;
-                block_keyboard = false;
-                break;
-            }
-
-            if (s.get_platform() == &special) {
-                s.set_key(true);
-                p9.neighbours |= TOP;
-                glutTimerFunc(30, on_timer_gate, TIMER_ID);
-                cout << "Key" << endl;
-            }
-            
-            if (s.get_platform() == e1.get_platform() && !e1.get_dead()) {
-                e1.set_dead(true);
-                e1.set_kill(true);
-            }
-            if (s.get_platform() == e2.get_platform() && !e2.get_dead()) {
-                e2.set_dead(true);
-                e2.set_kill(true);
-            }
-            if (s.get_platform() == e3.get_platform() && !e3.get_dead()) {
-                e3.set_dead(true);
-                e3.set_kill(true);
-            }
-            
-            glutTimerFunc(15, on_timer_move_player, TIMER_ID);
-        }
-        break;
-
-    case 'a':
-            if (!rotate_animation && !block_keyboard) {
-                s.rotate_left(true);
-
-                rotate_animation = true;
-                block_keyboard = true;
-                glutTimerFunc(15, on_timer_rotate_player, TIMER_ID1);
-            }
-        break;
-
-    case 'd':
-            if (!rotate_animation && !block_keyboard) {
-
-                rotate_animation = true;
-                block_keyboard = true;
-                s.rotate_right(true);
-                glutTimerFunc(15, on_timer_rotate_player, TIMER_ID2);
-            }
-        break;
-    case 'r' :
-            angle = 0;
-            xPos = 0;
-            yPos = 0;
-            player_animation = false;
-            rotate_animation = false;
-            enemy_animation = false;
-            translation_value = 10;
-            block_keyboard = false;
-            show_fly = true;
-
-            gate_down = false;
-            gate_parameter = 0;
-
-            key_angle = 0;
-            
-            e1.reset(-4, -4, 0, 1, v1, -1);
-            e2.reset(-8, -4, 0, 1, v2, -1);
-            e3.reset(-12, 4, 0, 3, v3, 1);
-
-            s.reset(&start);
-
-            p9.neighbours = p9.neighbours & ~TOP;
-
-        break;
-    default:
-        break;
-    }
-
-    glutPostRedisplay();
-}
-
-static void draw_level() {
-    
 }

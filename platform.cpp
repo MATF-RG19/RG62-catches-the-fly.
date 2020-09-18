@@ -41,15 +41,15 @@ platform* platform::get_neighbour(unsigned int side) {
     }
 }
 
+//deo koda je pod komentarom jer se te stranice platforme ne vide
 void platform::draw_platform(GLuint front, GLuint top, GLuint side) {
     
     glPushMatrix();
-    
-    //glColor3f(p, 0.5, 0.5);
     glTranslatef(this->x_pos, this->y_pos, this->z_pos);
     glScalef(3.8, 3.8, 1);
 
-    /*//left
+    /*
+    //left
     glBindTexture(GL_TEXTURE_2D, side);
         glBegin(GL_QUADS);
             glNormal3f(0, -1, 0);

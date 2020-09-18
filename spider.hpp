@@ -23,47 +23,75 @@ public:
 	//konstruktor
 	spider(platform * p);
 
-	//metode
+	/*metode*/
+
+    //iscrtava model pauka
 	void draw_spider(GLUquadricObj *sphere, GLuint texture) ;
 
+    //rotacija ulevo
     void rotate_left(bool r);
+    //rotacija udesno
 	void rotate_right(bool r);
-
+    //pomeranje napred
 	void move_forward();
     
+    //na osnovu vrednosti promenljive looking_at odredjuje vektor pravca igraca
     void calculate_the_direction_vector();
 
-    platform* get_platform();
+    //inicijalizacija informacija o igracu
+    void init(platform * p);
+
+    //postavljanje igraca na specificnu lokaciju
+    void set_position(double x, double y, double z);
+
+    //postavljanje platforme na kojoj se igrac nalazi
+    void set_platform(platform *p);
+    
+    //platforma na koju bi se igrac premestio u slucaju da nastavi kretanje
     platform* next_platform();
 
-    bool get_key();
-    void set_key(bool k);
-    bool get_dead();
-    void set_dead(bool d);
-    void set_position(double x, double y, double z);
-    void set_platform(platform *p);
-    void set_angle(double a);
-    void init(platform * p);
+    //vracanje igraca na pocetnu poziciju
     void reset(platform * p);
 
-    //polja
+    
+    void set_key(bool k);
+    void set_dead(bool d);
+    void set_angle(double a);
+
+    bool get_key();
+    bool get_dead();
+    platform* get_platform();
+
+    /*polja*/
+
+    //pozicija igraca
     double x_pos;
     double y_pos;
     double z_pos;
+
+    //platforma na kojoj se igrac trenutno nalazi
     platform* current_platform;
     
+    //vektor pravca igraca
     double direction_coordinate_x;
     double direction_coordinate_y;
-    double a;
-    
+
+    //ugao pod kojim se nalazi igrac - oko z ose
     double angle;
-    
+
+    //pravac u kom igrac gleda
     unsigned int looking_at;
+
+    //indikator da li je igrac ziv
     bool dead;
+
+    //indikator da li je igrac sakupio kljuc
     bool key;
+
+    //pomocna promenljiva
     bool rot;
 
-	//destruktor
+	/*destruktor*/
 	~spider();
 };
 #endif

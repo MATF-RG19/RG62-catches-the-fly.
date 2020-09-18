@@ -31,39 +31,6 @@ void spider::reset(platform * p) {
     init(p);
 }
 
-void spider::set_angle(double a) {
-    this->angle = a;
-}
-
-platform* spider::get_platform() {
-    return current_platform;
-}
-
-bool spider::get_key() {
-    return key;
-}
-void spider::set_key(bool k) {
-    this->key = k;
-}
-
-bool spider::get_dead() {
-    return this->dead;
-}
-
-void spider::set_dead(bool d) {
-    this->dead = d;
-}
-
-void spider::set_position(double x, double y, double z) {
-    this->x_pos = x;
-    this->y_pos = y;
-    this->z_pos = z;
-}
-
-void spider::set_platform(platform *p) {
-    this->current_platform = p;
-}
-
 //metod koji na osnovu informacije u kom smeru igrac gleda odredjuje vektor pravca
 void spider::calculate_the_direction_vector() {
     
@@ -87,6 +54,54 @@ void spider::calculate_the_direction_vector() {
     }
 }
 
+void spider::rotate_left(bool r) {
+    
+    if (r) {
+
+        this->looking_at <<= 1;
+        
+        if (this->looking_at == OVERFLOW) {
+            this->looking_at = 1;
+        }
+        
+        calculate_the_direction_vector();
+    }
+    else {
+        this->angle += 9.0;
+    }
+}
+
+void spider::rotate_right(bool r) {
+    
+    if (r) {
+    
+        this->looking_at >>= 1;
+        
+        if (this->looking_at == UNDERFLOW) {
+            this->looking_at = RIGHT;
+        }
+        
+        calculate_the_direction_vector();
+    }
+    else {
+        this->angle -= 9.0;
+    }
+}
+
+void spider::move_forward() {
+
+        x_pos += direction_coordinate_x * 0.4;
+        y_pos += direction_coordinate_y * 0.4;
+}
+
+platform* spider::next_platform() {
+
+    if (this->looking_at & this->current_platform->neighbours) {
+        current_platform = current_platform->get_neighbour(this->looking_at);
+    }
+    return current_platform;
+}
+
 //metod koji iscrtava pauka
 void spider::draw_spider(GLUquadricObj *sphere, GLuint texture) {
     
@@ -95,6 +110,7 @@ void spider::draw_spider(GLUquadricObj *sphere, GLuint texture) {
             glColor3f(1, 1, 1);
             glTranslatef(this->x_pos, this->y_pos, this->z_pos);
             glRotatef(this->angle, 0, 0, 1);
+            glScalef(1.2, 1.2, 1.2);
 
 
             glPushMatrix();
@@ -275,14 +291,6 @@ void spider::draw_spider(GLUquadricObj *sphere, GLuint texture) {
             glPopMatrix();
 
             //body
-            /*glPushMatrix();
-                glColor3f(0.93, 0.44, 0.42);
-                glTranslatef(-0.4, 0, -0.1);
-                glRotatef(45, 0, 0, 1);
-                glRotatef(-90, 0, 1, 0);
-                gluCylinder(sphere, 0.02, 0.02, 0.2, 5, 5);
-            glPopMatrix();*/
-
             glPushMatrix();
                 glColor3f(0.33, 0.32, 0.40);
                 glTranslatef(-0.2, 0, -0.2);
@@ -297,8 +305,6 @@ void spider::draw_spider(GLUquadricObj *sphere, GLuint texture) {
                 glTranslatef(0.55, 0, 0);
                 glScalef(1, 0.90, 0.7);
 
-
-
                 gluQuadricDrawStyle(sphere, GLU_FILL);
                 glBindTexture(GL_TEXTURE_2D, texture);
                 gluQuadricTexture(sphere, GLU_TRUE);
@@ -307,54 +313,40 @@ void spider::draw_spider(GLUquadricObj *sphere, GLuint texture) {
             glPopMatrix();
 
         glPopMatrix();
-        }
-}
-
-void spider::rotate_left(bool r) {
-    
-    if (r) {
-
-        this->looking_at <<= 1;
-        
-        if (this->looking_at == OVERFLOW) {
-            this->looking_at = 1;
-        }
-        
-        calculate_the_direction_vector();
-    }
-    else {
-        this->angle += 9.0;
     }
 }
 
-void spider::rotate_right(bool r) {
-    
-    if (r) {
-    
-        this->looking_at >>= 1;
-        
-        if (this->looking_at == UNDERFLOW) {
-            this->looking_at = RIGHT;
-        }
-        
-        calculate_the_direction_vector();
-    }
-    else {
-        this->angle -= 9.0;
-    }
+void spider::set_angle(double a) {
+    this->angle = a;
 }
 
-void spider::move_forward() {
-
-        x_pos += direction_coordinate_x * 0.4;
-        y_pos += direction_coordinate_y * 0.4;
+void spider::set_key(bool k) {
+    this->key = k;
 }
 
-platform* spider::next_platform() {
+void spider::set_dead(bool d) {
+    this->dead = d;
+}
 
-    if (this->looking_at & this->current_platform->neighbours) {
-        current_platform = current_platform->get_neighbour(this->looking_at);
-    }
+void spider::set_position(double x, double y, double z) {
+    this->x_pos = x;
+    this->y_pos = y;
+    this->z_pos = z;
+}
+
+void spider::set_platform(platform *p) {
+    this->current_platform = p;
+}
+
+bool spider::get_key() {
+    return key;
+}
+
+bool spider::get_dead() {
+    return this->dead;
+}
+
+platform* spider::get_platform() {
     return current_platform;
 }
 
