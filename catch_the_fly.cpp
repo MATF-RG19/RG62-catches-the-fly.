@@ -12,10 +12,15 @@
 #include "platform.hpp"
 #include "enemy.hpp"
 
+
 #define TIMER_ID 0
 #define TIMER_ID1 1
 #define TIMER_ID2 2
 #define TIMER_ID3 3
+
+#define WHITE 4
+#define RED  5
+#define GOLD 6
 
 using namespace std;
 
@@ -30,6 +35,7 @@ static void on_timer_move_player(int value);
 static void on_timer_move_enemyes(int value);
 static void on_timer_move_enemy(int value);
 static void on_timer_rotate_player(int value);
+static void on_timer_game(int value);
 static void on_timer_gate(int value);
 static void on_timer(int value);
 
@@ -55,6 +61,11 @@ bool gate_down = false;
 double gate_parameter = 0;
 
 int key_angle = 0;
+unsigned time_value = 0;
+
+//indikatori vidljivosti teksta
+bool show_noice = false;
+bool show_ouch = false;
 
 GLUquadricObj *quadratic = gluNewQuadric();
 
@@ -100,6 +111,35 @@ vector<platform*> v3 = {&p14, &p11, &p9, &p13, &p15};
 enemy e1(-4, -4, 0.1, 1, v1, -1);
 enemy e2(-8, -4, 0.1, 1, v2, -1);
 enemy e3(-12, 4, 0.1, 3, v3, 1);
+
+//Funkcija koja vrsi ispis teksta u prostoru,
+//koristi se za ispis broja preostalih klikova potrebnih 
+//da bi se povrce skroz uvuklo pod zemlju
+void show_text(string text, int color, double x, double y, double z)
+{ 
+    //Opcija 0 je ispis teksta belom bojom, odnosno kada je 
+    //krtica delom uvukla povrce, ali trenutno nije zakacena za njega
+    //Opcija 1 je za ispis u slucaju da krtica uvlaci trenutno, tekst se ispisuje crveno
+    
+    //Ne zelimo da se tekst osvetljava
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+        
+    if(color == WHITE)
+        glColor3f(1, 1, 1);
+    else if (color == RED) 
+        glColor3f(1, 0, 0);
+    else if (color == GOLD)
+        glColor3f(0.86, 0.68, 0.30);
+    
+    glRasterPos3f(x, y, z);
+
+    for(int i = 0; i < text.size(); i++)
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
+        
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHTING); 
+}
 
 int main(int argc, char **argv)
 {
@@ -153,7 +193,9 @@ int main(int argc, char **argv)
     p13.set_neighbours(&p9, &p15, nullptr, &p8);
     p14.set_neighbours(nullptr, &p11, nullptr, &p10);
     p15.set_neighbours(&p13, nullptr, nullptr, &p12);
+
     glutTimerFunc(100, on_timer, TIMER_ID);
+    glutTimerFunc(1000, on_timer_game, TIMER_ID);
 
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -183,8 +225,17 @@ static void on_display(void)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
     gluLookAt(15, 15, 15, -8, 0, 0, 0, 0, 1);
+
+    show_text("Time:", WHITE, 0, 4, 14);
+    show_text(to_string(time_value), WHITE, 0, 5.5, 14.05);
+
+    if(show_noice) {
+        show_text("Noice!", GOLD, 0, 4.155, 13.5);
+    }
+    if(show_ouch) {
+        show_text("Ouch!", RED, 0, 4.15, 13.5);
+    }
 
     if (!s.get_key()) {
         glPushMatrix();
@@ -371,6 +422,7 @@ void activate_enemies() {
         if (e1.get_platform() == s.get_platform()) {
             s.set_dead(true);
             glutTimerFunc(15, on_timer_move_enemy, TIMER_ID1);
+            show_ouch = true;
             return;
         }
     }
@@ -379,6 +431,7 @@ void activate_enemies() {
         if (e2.get_platform() == s.get_platform()) {
             s.set_dead(true);
             glutTimerFunc(15, on_timer_move_enemy, TIMER_ID2);
+            show_ouch = true;
             return;
         }
     }
@@ -387,6 +440,7 @@ void activate_enemies() {
         if (e3.get_platform() == s.get_platform()) {
             s.set_dead(true);
             glutTimerFunc(15, on_timer_move_enemy, TIMER_ID3);
+            show_ouch = true;
             return;
         }
     }
@@ -423,6 +477,7 @@ static void on_timer_move_player(int value) {
         if (s.get_platform() == &end_game && s.get_key()) {
             block_keyboard = true;
             show_fly = false;
+            show_noice = true;
             //cout << "End" << endl;
         }
         else {
@@ -523,6 +578,20 @@ static void on_timer_gate(int value) {
 
     if(!gate_down)
         glutTimerFunc(15, on_timer_gate, value);
+}
+
+static void on_timer_game(int value) {
+
+    if (value != TIMER_ID) {
+        return;
+    }
+
+    time_value++;
+
+    glutPostRedisplay();
+
+    if(!s.get_dead())
+        glutTimerFunc(1000, on_timer_game, value);
 }
 
 static void on_timer(int value) {
@@ -630,6 +699,7 @@ static void on_keyboard(unsigned char key, int x, int y)
             gate_parameter = 0;
 
             key_angle = 0;
+            time_value = 0;
             
             e1.reset(-4, -4, 0, 1, v1, -1);
             e2.reset(-8, -4, 0, 1, v2, -1);
@@ -637,7 +707,11 @@ static void on_keyboard(unsigned char key, int x, int y)
 
             s.reset(&start);
 
+            show_noice = false;
+            show_ouch = false;
+
             p9.neighbours = p9.neighbours & ~TOP;
+            glutTimerFunc(1000, on_timer_game, TIMER_ID);
         break;
     default:
         break;
