@@ -19,8 +19,10 @@ Pauk ce biti pojeden u slucaju da je platforma na kojoj on boravi bas platforma 
 | <kbd>R</kbd>  |Ponovno pokretanje  |
 | <kbd>ESC</kbd>  |Prekidanje igrice|
 
-## :wrench: Instalacija:
-1.Pomoću terminala zadati komandu za kloniranje:``` git clone https://github.com/MATF-RG19/RG62-catches-the-fly..git```     
-2.Pozicionirajte se u direktorijum sa nazivom ``RG62-catches-the-fly.``   
-3.Pokrenite Makefile komandom ```make```     
-4.Igricu pokrenite sa ``./catch_the_fly``
+## :wrench: Instalacija[Linux]:
+1.Pomocu terminala zadati komandu za kloniranje repozitorijuma: ```git clone https://github.com/MATF-RG19/RG62-catches-the-fly..git```     
+2.Pozicionirajte se u direktorijum sa nazivom ``RG62-catches-the-fly.``
+3.Kreirajte direktorijum ```build``` i pozicionirajte se u njega
+4.Pomocu terminala izvrsiti komandu: ```cmake -G 'Unix Makefiles' ..```
+5.Pokrenite Makefile komandom ```make```     
+6.Igricu iz terminala pokrenite komandom: ``./catches_the_fly``
