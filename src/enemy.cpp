@@ -1,7 +1,7 @@
-#include <iostream>
 #include "../headers/enemy.hpp"
+#include <iostream>
 
-enemy::enemy() {};
+enemy::enemy() = default;;
 
 enemy::enemy(double x, double y, double z, int pos, std::vector<platform*>& p, int d) {
     init(x, y, z, pos, p, d);
@@ -107,4 +107,4 @@ platform* enemy::get_platform() {
     return platforms[position];
 }
 
-enemy::~enemy() {};
+enemy::~enemy() = default;;

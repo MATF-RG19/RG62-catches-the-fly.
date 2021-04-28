@@ -1,6 +1,6 @@
-#include <iostream>
-#include <cmath>
 #include "../headers/spider.hpp"
+#include <cmath>
+#include <iostream>
 
 void spider::init(platform * p) {
     this->x_pos = 0;
@@ -350,4 +350,4 @@ platform* spider::get_platform() {
     return current_platform;
 }
 
-spider::~spider() {};
+spider::~spider() = default;;
