@@ -3,12 +3,12 @@
 ## :spider: Opis igre:
 Zadatak igraca je da pauka dovede do svog rucka, pritom pokusavajuci da izbegne sve prepreke koje mu se javljaju na putu.
 
-## :exclamation: Uputstvo:
-Igra je potezna. Svaki potez sastji se od pomeranje pauka od strane igraca i automatskog pomeranja neprijatelja.
+## :book: Uputstvo:
+Igra je potezna. Svaki potez sastoji se od pomeranje pauka od strane igraca i automatskog pomeranja neprijatelja.
 Igrac je u mogucnosti da pauka rotira u mestu kako bi izabrao platformu na koju zeli da se premesti kao i da pauka na tu platformu premesti. 
-U slucaju da se na toj platformi nalazi neprijatelj on ce biti unisten.
-Nakon sto se pauk premesti na izabranu platformu, automatski se pokrecu neprijatelji koji se premestaju na unapred odredjenu platformu.
-Pauk ce biti unisten u slucaju da je platforma na kojoj on boravi bas platforma na koju se premesta neki od neprijatelja.
+U slucaju da se na toj platformi nalazi neprijatelj on ce biti pojeden.
+Nakon sto se pauk premesti na izabranu platformu, automatski se aktiviraju neprijatelji koji se premestaju na unapred odredjenu platformu.
+Pauk ce biti pojeden u slucaju da je platforma na kojoj on boravi bas platforma na koju se premesta neki od neprijatelja.
 
 ## :video_game: Komande:
 |Komanda   | Akcija  |
