@@ -1,11 +1,11 @@
-#include <iostream>
-#include <GL/glut.h>
-#include "../headers/spider.hpp"
 #include "../headers/platform.hpp"
+#include "../headers/spider.hpp"
+#include <GL/glut.h>
+#include <iostream>
 
 using namespace std;
 
-platform::platform() {};
+platform::platform() = default;;
 
 platform::platform(int x, int y, int z, unsigned int n) {
     
@@ -166,5 +166,5 @@ void platform::draw_platform(GLuint front, GLuint top, GLuint side) {
     glPopMatrix();
 }
 
-platform::~platform() {};
+platform::~platform() = default;;
 

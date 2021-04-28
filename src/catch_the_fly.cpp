@@ -1,16 +1,16 @@
-#include <iostream>
-#include <stdlib.h>
 #include <GL/glut.h>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
 #include <string>
-#include <time.h>
-#include <vector>
 #include <unistd.h>
+#include <vector>
 
-#include "../headers/image.h"
-#include "../headers/spider.hpp"
-#include "../headers/platform.hpp"
 #include "../headers/enemy.hpp"
+#include "../headers/image.h"
+#include "../headers/platform.hpp"
+#include "../headers/spider.hpp"
 
 #define TIMER_ID 0
 #define TIMER_ID1 1
@@ -26,7 +26,7 @@ using namespace std;
 static int window_width = 1400;
 static int window_height = 800;
 
-static void on_display(void);
+static void on_display();
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 
@@ -38,7 +38,7 @@ static void on_timer_game(int value);
 static void on_timer_gate(int value);
 static void on_timer(int value);
 
-static void initialize(void);
+static void initialize();
 static void draw_parametrized_cube(GLuint front, GLuint top, GLuint side);
 
 //niz identifikatora tekstura
@@ -135,8 +135,8 @@ void show_text(string text, int color, double x, double y, double z)
     
     glRasterPos3f(x, y, z);
 
-    for(int i = 0; i < text.size(); i++)
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
+    for(char i : text)
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, i);
         
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING); 
@@ -214,7 +214,7 @@ static void on_reshape(int width, int height)
     window_height = height;
 }
 
-static void on_display(void)
+static void on_display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -849,7 +849,7 @@ static void draw_parametrized_cube(GLuint front, GLuint top, GLuint side) {
 
 
 //funkcija po uzoru na funkciju inicijalizacije sa vezbi
-static void initialize(void)
+static void initialize()
 {
     //instanciranje objekta tipa image
     Image * image;
