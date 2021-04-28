@@ -1,5 +1,5 @@
-#include "enemy.hpp"
 #include <iostream>
+#include "../headers/enemy.hpp"
 
 enemy::enemy() {};
 

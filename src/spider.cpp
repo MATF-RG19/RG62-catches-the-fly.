@@ -1,6 +1,6 @@
-#include "spider.hpp"
 #include <iostream>
 #include <cmath>
+#include "../headers/spider.hpp"
 
 void spider::init(platform * p) {
     this->x_pos = 0;

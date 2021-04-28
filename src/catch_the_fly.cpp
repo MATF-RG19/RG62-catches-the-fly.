@@ -1,17 +1,16 @@
 #include <iostream>
-#include <GL/glut.h>
 #include <stdlib.h>
+#include <GL/glut.h>
 #include <cmath>
 #include <string>
 #include <time.h>
 #include <vector>
 #include <unistd.h>
 
-#include "image.h"
-#include "spider.hpp"
-#include "platform.hpp"
-#include "enemy.hpp"
-
+#include "../headers/image.h"
+#include "../headers/spider.hpp"
+#include "../headers/platform.hpp"
+#include "../headers/enemy.hpp"
 
 #define TIMER_ID 0
 #define TIMER_ID1 1
@@ -48,6 +47,8 @@ static GLuint names[25];
 int angle = 0;
 float xPos = 0;
 float yPos = 0;
+
+std::string texture_path = "../textures/";
 
 bool player_animation = false;
 bool rotate_animation = false;
@@ -877,7 +878,7 @@ static void initialize(void)
     //kako bi radilo u image.c sam promenio da drugi argument fje image_read bude
     //konstantan char*
     //a onda sam na internetu pronasao metodu c_str() nad objektima tipa string
-    string s1 = "textures/cross.bmp";
+    string s1 = texture_path + "cross.bmp";
     image_read(image, s1.c_str());
 
     
@@ -901,7 +902,7 @@ static void initialize(void)
 
 
 
-    std::string s2 = "textures/horizontal.bmp";
+    std::string s2 = texture_path + "horizontal.bmp";
     image_read(image, s2.c_str());
  
     //podesavanja teksture
@@ -922,7 +923,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s3 = "textures/vertical.bmp";
+    std::string s3 = texture_path + "vertical.bmp";
     image_read(image, s3.c_str());
  
     //podesavanja teksture
@@ -943,7 +944,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s4 = "textures/top.bmp";
+    std::string s4 = texture_path + "top.bmp";
     image_read(image, s4.c_str());
  
     //podesavanja teksture
@@ -964,7 +965,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s5 = "textures/bottom.bmp";
+    std::string s5 = texture_path + "bottom.bmp";
     image_read(image, s5.c_str());
  
     //podesavanja teksture
@@ -985,7 +986,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s6 = "textures/left.bmp";
+    std::string s6 = texture_path + "left.bmp";
     image_read(image, s6.c_str());
  
     //podesavanja teksture
@@ -1006,7 +1007,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s7 = "textures/angle_t_l.bmp";
+    std::string s7 = texture_path + "angle_t_l.bmp";
     image_read(image, s7.c_str());
  
     //podesavanja teksture
@@ -1027,7 +1028,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s8 = "textures/angle_b_r.bmp";
+    std::string s8 = texture_path + "angle_b_r.bmp";
     image_read(image, s8.c_str());
  
     //podesavanja teksture
@@ -1048,7 +1049,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s9 = "textures/angle_b_l.bmp";
+    std::string s9 = texture_path + "angle_b_l.bmp";
     image_read(image, s9.c_str());
  
     //podesavanja teksture
@@ -1069,7 +1070,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s10 = "textures/left_t.bmp";
+    std::string s10 = texture_path + "left_t.bmp";
     image_read(image, s10.c_str());
  
     //podesavanja teksture
@@ -1090,7 +1091,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s11 = "textures/top_t.bmp";
+    std::string s11 = texture_path + "top_t.bmp";
     image_read(image, s11.c_str());
  
     //podesavanja teksture
@@ -1111,7 +1112,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s12 = "textures/bottom_t.bmp";
+    std::string s12 = texture_path + "bottom_t.bmp";
     image_read(image, s12.c_str());
  
     //podesavanja teksture
@@ -1132,7 +1133,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s13 = "textures/right_t.bmp";
+    std::string s13 = texture_path + "right_t.bmp";
     image_read(image, s13.c_str());
  
     //podesavanja teksture
@@ -1153,7 +1154,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s14 = "textures/platform_front.bmp";
+    std::string s14 = texture_path + "platform_front.bmp";
     image_read(image, s14.c_str());
  
     //podesavanja teksture
@@ -1174,7 +1175,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s15 = "textures/platform_side.bmp";
+    std::string s15 = texture_path + "platform_side.bmp";
     image_read(image, s15.c_str());
  
     //podesavanja teksture
@@ -1195,7 +1196,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-     std::string s16 = "textures/base_top.bmp";
+     std::string s16 = texture_path + "base_top.bmp";
     image_read(image, s16.c_str());
  
     //podesavanja teksture
@@ -1216,7 +1217,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s17 = "textures/base_front_side.bmp";
+    std::string s17 = texture_path + "base_front_side.bmp";
     image_read(image, s17.c_str());
  
     //podesavanja teksture
@@ -1237,7 +1238,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s18 = "textures/bush_top.bmp";
+    std::string s18 = texture_path + "bush_top.bmp";
     image_read(image, s18.c_str());
  
     //podesavanja teksture
@@ -1258,7 +1259,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s19 = "textures/bush_front.bmp";
+    std::string s19 = texture_path + "bush_front.bmp";
     image_read(image, s19.c_str());
  
     //podesavanja teksture
@@ -1279,7 +1280,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s20 = "textures/bush_side.bmp";
+    std::string s20 = texture_path + "bush_side.bmp";
     image_read(image, s20.c_str());
  
     //podesavanja teksture
@@ -1300,7 +1301,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s21 = "textures/spider_body.bmp";
+    std::string s21 = texture_path + "spider_body.bmp";
     image_read(image, s21.c_str());
  
     //podesavanja teksture
@@ -1321,7 +1322,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s22 = "textures/key.bmp";
+    std::string s22 = texture_path + "key.bmp";
     image_read(image, s22.c_str());
  
     //podesavanja teksture
@@ -1342,7 +1343,7 @@ static void initialize(void)
     //zavrsavamo rad nad teksturom
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    std::string s23 = "textures/enemy.bmp";
+    std::string s23 = texture_path + "enemy.bmp";
     image_read(image, s23.c_str());
  
     //podesavanja teksture
@@ -1366,5 +1367,4 @@ static void initialize(void)
 
     //uklanjamo dinamicki alociran objekat
     image_done(image);
-
 }

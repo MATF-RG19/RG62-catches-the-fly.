@@ -1,7 +1,7 @@
-#include "spider.hpp"
-#include "platform.hpp"
 #include <iostream>
 #include <GL/glut.h>
+#include "../headers/spider.hpp"
+#include "../headers/platform.hpp"
 
 using namespace std;
 
