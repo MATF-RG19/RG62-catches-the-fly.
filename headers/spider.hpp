@@ -3,10 +3,10 @@
 #define SPIDER_HPP
 
 #include "platform.hpp"
-#include <stdlib.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include <stdlib.h>
 
 #define TOP 1
 #define LEFT 2
@@ -16,82 +16,79 @@
 #define UNDERFLOW 0
 #define T_VALUE 1
 
-class spider
-{
-public:
-    
-	//konstruktor
-	spider(platform * p);
+class spider {
+  public:
+  // konstruktor
+  spider(platform *p);
 
-	/*metode*/
+  /*metode*/
 
-    //iscrtava model pauka
-	void draw_spider(GLUquadricObj *sphere, GLuint texture) ;
+  // iscrtava model pauka
+  void draw_spider(GLUquadricObj *sphere, GLuint texture);
 
-    //rotacija ulevo
-    void rotate_left(bool r);
-    //rotacija udesno
-	void rotate_right(bool r);
-    //pomeranje napred
-	void move_forward();
-    
-    //na osnovu vrednosti promenljive looking_at odredjuje vektor pravca igraca
-    void calculate_the_direction_vector();
+  // rotacija ulevo
+  void rotate_left(bool r);
+  // rotacija udesno
+  void rotate_right(bool r);
+  // pomeranje napred
+  void move_forward();
 
-    //inicijalizacija informacija o igracu
-    void init(platform * p);
+  // na osnovu vrednosti promenljive looking_at odredjuje vektor pravca igraca
+  void calculate_the_direction_vector();
 
-    //postavljanje igraca na specificnu lokaciju
-    void set_position(double x, double y, double z);
+  // inicijalizacija informacija o igracu
+  void init(platform *p);
 
-    //postavljanje platforme na kojoj se igrac nalazi
-    void set_platform(platform *p);
-    
-    //platforma na koju bi se igrac premestio u slucaju da nastavi kretanje
-    platform* next_platform();
+  // postavljanje igraca na specificnu lokaciju
+  void set_position(double x, double y, double z);
 
-    //vracanje igraca na pocetnu poziciju
-    void reset(platform * p);
+  // postavljanje platforme na kojoj se igrac nalazi
+  void set_platform(platform *p);
 
-    
-    void set_key(bool k);
-    void set_dead(bool d);
-    void set_angle(double a);
+  // platforma na koju bi se igrac premestio u slucaju da nastavi kretanje
+  platform *next_platform();
 
-    bool get_key();
-    bool get_dead();
-    platform* get_platform();
+  // vracanje igraca na pocetnu poziciju
+  void reset(platform *p);
 
-    /*polja*/
+  void set_key(bool k);
+  void set_dead(bool d);
+  void set_angle(double a);
 
-    //pozicija igraca
-    double x_pos;
-    double y_pos;
-    double z_pos;
+  bool get_key();
+  bool get_dead();
+  platform *get_platform();
 
-    //platforma na kojoj se igrac trenutno nalazi
-    platform* current_platform;
-    
-    //vektor pravca igraca
-    double direction_coordinate_x;
-    double direction_coordinate_y;
+  /*polja*/
 
-    //ugao pod kojim se nalazi igrac - oko z ose
-    double angle;
+  // pozicija igraca
+  double x_pos;
+  double y_pos;
+  double z_pos;
 
-    //pravac u kom igrac gleda
-    unsigned int looking_at;
+  // platforma na kojoj se igrac trenutno nalazi
+  platform *current_platform;
 
-    //indikator da li je igrac ziv
-    bool dead;
+  // vektor pravca igraca
+  double direction_coordinate_x;
+  double direction_coordinate_y;
 
-    //indikator da li je igrac sakupio kljuc
-    bool key;
+  // ugao pod kojim se nalazi igrac - oko z ose
+  double angle;
 
-    //pomocna promenljiva
-    bool rot;
+  // pravac u kom igrac gleda
+  unsigned int looking_at;
 
-	/*destruktor*/
-	~spider();
+  // indikator da li je igrac ziv
+  bool dead;
+
+  // indikator da li je igrac sakupio kljuc
+  bool key;
+
+  // pomocna promenljiva
+  bool rot;
+
+  /*destruktor*/
+  ~spider();
 };
 #endif
