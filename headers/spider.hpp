@@ -19,7 +19,7 @@
 class spider {
   public:
   // konstruktor
-  spider(platform *p);
+  explicit spider(platform *p);
 
   /*metode*/
 

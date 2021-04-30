@@ -12,6 +12,13 @@ include_directories(${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS})
 file(GLOB_RECURSE CFILES "${CMAKE_SOURCE_DIR}/*.c")
 SET_SOURCE_FILES_PROPERTIES(${CFILES} PROPERTIES LANGUAGE CXX)
 
+#SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+#SET(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+#SET(CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
+
+#SET(CMAKE_CXX_FLAGS "-g")
+#SET(CMAKE_C_FLAGS "-g")
+
 add_library(
     texture_loader
     STATIC

@@ -14,6 +14,11 @@ platform::platform(int x, int y, int z, unsigned int n) {
   y_pos = y;
   z_pos = z;
 
+  this->lp = nullptr;
+  this->rp = nullptr;
+  this->tp = nullptr;
+  this->bp = nullptr;
+
   neighbours = n;
 }
 
